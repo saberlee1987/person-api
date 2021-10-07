@@ -23,7 +23,7 @@ public interface PersonSoapService {
     @WebMethod(operationName = "FindByNationalCode",action = "FindByNationalCode")
     @ResponseWrapper(localName = "FindByNationalCodeResponse",className = "FindByNationalCodeResponse")
     @WebResult(name = "PersonResponseDto")
-    PersonResponseDto findByNationalCode(@WebParam(name = "nationalCode") @XmlElement(required = true,defaultValue = "0079028748") String nationalCode);
+    PersonResponseDto findByNationalCode(@WebParam(name = "nationalCode") @XmlElement(required = true,defaultValue = "") String nationalCode);
 
 
     @WebMethod(operationName = "FindAll",action = "FindAll")

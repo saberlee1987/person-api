@@ -28,7 +28,7 @@ public class PersonSoapServiceImpl implements PersonSoapService {
         Set<ConstraintViolation<PersonDto>> errorValidation = validatorAdapter.validate(dto);
         if (errorValidation.size() > 0) {
             return new PersonResponseDto(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString(),
-                    null, getValidation(errorValidation)));
+                     getValidation(errorValidation)));
         } else {
             return new PersonResponseDto(this.personService.addPerson(dto).getResponse());
         }
@@ -39,7 +39,7 @@ public class PersonSoapServiceImpl implements PersonSoapService {
         ResponseDto<PersonEntity> responseDto = new ResponseDto<>();
         if (nationalCode == null || nationalCode.trim().length() < 10 || !nationalCode.trim().matches("\\d+")) {
             return  new PersonResponseDto(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString()
-                    , null, getValidation("nationalCode", "nationalCode invalid")));
+                    ,  getValidation("nationalCode", "nationalCode invalid")));
         }
         return new PersonResponseDto(this.personService.findByNationalCode(nationalCode).getResponse());
 }
@@ -69,11 +69,10 @@ public class PersonSoapServiceImpl implements PersonSoapService {
         return validations;
     }
 
-    private ErrorResponse getErrorResponse(Integer code, String message, String originalMessage, List<ValidationDto> validationDtoList) {
+    private ErrorResponse getErrorResponse(Integer code, String message, List<ValidationDto> validationDtoList) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setCode(code);
         errorResponse.setMessage(message);
-        errorResponse.setOriginalMessage(originalMessage);
         errorResponse.setValidations(validationDtoList);
         return errorResponse;
     }
