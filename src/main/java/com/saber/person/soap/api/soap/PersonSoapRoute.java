@@ -6,14 +6,13 @@ import com.saber.person.soap.api.soap.dto.PersonAllResponseDto;
 import com.saber.person.soap.api.soap.dto.PersonResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
-import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.cxf.common.message.CxfConstants;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class PersonSoapRoute extends RouteBuilder {
+public class PersonSoapRoute extends AbstractRestRoute {
     private final String url;
 
     private final PersonSoapService personSoapService;
@@ -27,6 +26,9 @@ public class PersonSoapRoute extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
+
+        super.configure();
+
         from(url)
                 .choice()
                 .when(header(CxfConstants.OPERATION_NAME).isEqualTo("AddPerson"))

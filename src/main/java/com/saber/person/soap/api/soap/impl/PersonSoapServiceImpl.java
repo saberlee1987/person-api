@@ -30,12 +30,7 @@ public class PersonSoapServiceImpl implements PersonSoapService {
             return new PersonResponseDto(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString(),
                     null, getValidation(errorValidation)));
         } else {
-            try {
-                return new PersonResponseDto(this.personService.addPerson(dto).getResponse());
-            } catch (Exception exception) {
-               return new PersonResponseDto(getErrorResponse(HttpStatus.BAD_REQUEST.value(),
-                        HttpStatus.BAD_REQUEST.toString(), exception.getMessage(), null));
-            }
+            return new PersonResponseDto(this.personService.addPerson(dto).getResponse());
         }
     }
 
@@ -46,13 +41,8 @@ public class PersonSoapServiceImpl implements PersonSoapService {
             return  new PersonResponseDto(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString()
                     , null, getValidation("nationalCode", "nationalCode invalid")));
         }
-        try {
-            return new PersonResponseDto(this.personService.findByNationalCode(nationalCode).getResponse());
-        } catch (Exception ex) {
-            return  new PersonResponseDto((getErrorResponse(HttpStatus.NOT_ACCEPTABLE.value(),
-                    HttpStatus.NOT_ACCEPTABLE.toString(), ex.getMessage(), null)));
-        }
-    }
+        return new PersonResponseDto(this.personService.findByNationalCode(nationalCode).getResponse());
+}
 
     @Override
     public PersonAllResponseDto findAll() {
