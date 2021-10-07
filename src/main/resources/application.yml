@@ -1,0 +1,74 @@
+server:
+  port: 8001
+  servlet:
+    encoding:
+      force: true
+      charset: UTF-8
+  tomcat:
+    threads:
+      max: 3000
+      min-spare: 300
+    accept-count: 300
+    connection-timeout: 60000
+    max-keep-alive-requests: 300
+    max-connections: 10000
+    max-http-form-post-size: 20
+
+
+springfox:
+  documentation:
+    swagger:
+      v2:
+        path: '/services/person-docs/v2/api-docs'
+
+cxf:
+  path: /soapServices
+
+
+spring:
+  application:
+    name: person-service
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:person
+    username: sa
+    password: sa
+    hikari:
+      maximum-pool-size: 100
+      minimum-idle: 35
+      max-lifetime: 10000
+      idle-timeout: 8000
+      connection-timeout: 8000
+      initialization-fail-timeout: 8000
+  jpa:
+    generate-ddl: false
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      ddl-auto: update
+    show-sql: true
+    database: h2
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+
+hawtio:
+  authenticationEnabled: false
+management:
+  metrics:
+  distribution:
+    percentiles-histogram:
+      "[http.server.requests]": true
+    sla:
+      "[http.server.requests]": 10ms, 100ms
+    percentiles:
+      "[http.server.requests]": 0.5, 0.75, 0.95, 0.98, 0.99, 0.999, 1.0
+    tags:
+      application: ${spring.application.name}
+  endpoints:
+    web:
+      base-path: /actuators/person
+      exposure:
+        include: '*'
+
