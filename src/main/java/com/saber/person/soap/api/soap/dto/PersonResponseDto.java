@@ -1,13 +1,20 @@
 package com.saber.person.soap.api.soap.dto;
 
-import com.saber.person.soap.api.dto.ErrorResponse;
-import com.saber.person.soap.api.entity.PersonEntity;
 import lombok.Data;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "PersonResponseDto",propOrder = {
+        "response",
+        "error"
+})
 @Data
 public class PersonResponseDto {
     private PersonEntity response;
-    private ErrorResponse error;
+    private ErrorResponse  error;
 
     public PersonResponseDto() {
     }
@@ -16,7 +23,7 @@ public class PersonResponseDto {
         this.response = response;
     }
 
-    public PersonResponseDto(PersonEntity response, ErrorResponse error) {
+    public PersonResponseDto(PersonEntity response, ErrorResponse  error) {
         this.response = response;
         this.error = error;
     }

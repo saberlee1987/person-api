@@ -1,7 +1,6 @@
 package com.saber.person.soap.api.soap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.saber.person.soap.api.dto.PersonDto;
 import com.saber.person.soap.api.soap.dto.PersonAllResponseDto;
 import com.saber.person.soap.api.soap.dto.PersonResponseDto;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +33,7 @@ public class PersonSoapRoute extends AbstractRestRoute {
                 .when(header(CxfConstants.OPERATION_NAME).isEqualTo("AddPerson"))
                 .removeHeaders("*")
                 .process(exchange -> {
-                    PersonDto dto = exchange.getIn().getBody(PersonDto.class);
+                    com.saber.person.soap.api.soap.dto.PersonDto dto = exchange.getIn().getBody(com.saber.person.soap.api.soap.dto.PersonDto.class);
                     log.info("Request for addPerson ====> {}", mapper.writeValueAsString(dto));
 
                     PersonResponseDto response = personSoapService.addPerson(dto);

@@ -1,12 +1,18 @@
 package com.saber.person.soap.api.soap.dto;
 
-import com.saber.person.soap.api.dto.ErrorResponse;
-import com.saber.person.soap.api.entity.PersonEntity;
 import lombok.Data;
-
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import java.util.List;
 
 @Data
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "PersonAllResponseDto",propOrder = {
+        "persons",
+        "error"
+})
 public class PersonAllResponseDto {
     private List<PersonEntity> persons;
     private ErrorResponse error;

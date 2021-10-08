@@ -1,7 +1,6 @@
 package com.saber.person.soap.api.soap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.saber.person.soap.api.dto.ErrorResponse;
 import com.saber.person.soap.api.exceptions.ResourceDuplicationException;
 import com.saber.person.soap.api.exceptions.ResourceNotFoundException;
 import com.saber.person.soap.api.soap.dto.PersonResponseDto;
@@ -52,8 +51,8 @@ public class AbstractRestRoute extends RouteBuilder {
 
     }
 
-    private ErrorResponse getErrorResponse(Integer code, String message, String originalMessage) {
-        ErrorResponse errorResponse = new ErrorResponse();
+    private com.saber.person.soap.api.soap.dto.ErrorResponse getErrorResponse(Integer code, String message, String originalMessage) {
+        com.saber.person.soap.api.soap.dto.ErrorResponse errorResponse = new com.saber.person.soap.api.soap.dto.ErrorResponse();
         errorResponse.setCode(code);
         errorResponse.setMessage(message);
         errorResponse.setOriginalMessage(originalMessage);
