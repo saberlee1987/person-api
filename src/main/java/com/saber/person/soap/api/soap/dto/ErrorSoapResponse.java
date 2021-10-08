@@ -1,13 +1,14 @@
 package com.saber.person.soap.api.soap.dto;
 
 import lombok.Data;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.List;
+
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ErrorResponse",propOrder = {
+@XmlType(name = "ErrorSoapResponse",propOrder = {
         "code",
         "message",
         "originalMessage",
@@ -15,9 +16,9 @@ import java.util.List;
 
 })
 @Data
-public class ErrorResponse {
+public class ErrorSoapResponse {
     private Integer code;
     private String message;
     private String originalMessage;
-    private List<ValidationDto> validations;
+    private List<ValidationSoapDto> validations;
 }

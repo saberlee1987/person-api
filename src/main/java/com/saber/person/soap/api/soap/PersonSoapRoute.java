@@ -2,7 +2,8 @@ package com.saber.person.soap.api.soap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saber.person.soap.api.soap.dto.PersonAllResponseDto;
-import com.saber.person.soap.api.soap.dto.PersonResponseDto;
+import com.saber.person.soap.api.soap.dto.PersonSoapDto;
+import com.saber.person.soap.api.soap.dto.PersonSoapResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.cxf.common.message.CxfConstants;
@@ -33,20 +34,19 @@ public class PersonSoapRoute extends AbstractRestRoute {
                 .when(header(CxfConstants.OPERATION_NAME).isEqualTo("AddPerson"))
                 .removeHeaders("*")
                 .process(exchange -> {
-                    com.saber.person.soap.api.soap.dto.PersonDto dto = exchange.getIn().getBody(com.saber.person.soap.api.soap.dto.PersonDto.class);
+                    PersonSoapDto dto = exchange.getIn().getBody(PersonSoapDto.class);
                     log.info("Request for addPerson ====> {}", mapper.writeValueAsString(dto));
 
-                    PersonResponseDto response = personSoapService.addPerson(dto);
+                    PersonSoapResponseDto response = personSoapService.addPerson(dto);
                     if (response.getResponse() != null) {
                         log.info("Response  for addPerson with statusCode {} ====> {}"
                                 , HttpStatus.OK.value()
                                 , mapper.writeValueAsString(response));
-                        exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, HttpStatus.OK.value());
+
                     } else {
                         log.error("Error  for addPerson with statusCode {} ====> {}"
                                 , response.getError().getCode()
                                 , mapper.writeValueAsString(response.getError()));
-                        exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, response.getError().getCode());
                     }
                     exchange.getMessage().setBody(response);
                 })
@@ -55,17 +55,16 @@ public class PersonSoapRoute extends AbstractRestRoute {
                 .process(exchange -> {
                     String nationalCode = exchange.getIn().getBody(String.class);
                     log.info("Request for FindByNationalCode ====> {}", nationalCode);
-                    PersonResponseDto response = personSoapService.findByNationalCode(nationalCode);
+                    PersonSoapResponseDto response = personSoapService.findByNationalCode(nationalCode);
                     if (response.getResponse() != null) {
                         log.info("Response  for FindByNationalCode with statusCode {} ====> {}"
                                 , HttpStatus.OK.value()
                                 , mapper.writeValueAsString(response));
-                        exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, HttpStatus.OK.value());
+
                     } else {
                         log.error("Error  for FindByNationalCode with statusCode {} ====> {}"
                                 , response.getError().getCode()
                                 , mapper.writeValueAsString(response));
-                        exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, response.getError().getCode());
                     }
                     exchange.getMessage().setBody(response);
                 })
@@ -77,10 +76,10 @@ public class PersonSoapRoute extends AbstractRestRoute {
                             , HttpStatus.OK.value()
                             , mapper.writeValueAsString(response));
                     exchange.getMessage().setBody(response);
-                    exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, 200);
                 })
                 .endChoice()
                 .end()
+                .setHeader(Exchange.HTTP_RESPONSE_CODE,constant(200))
                 .log("Service called .............. ");
     }
 }

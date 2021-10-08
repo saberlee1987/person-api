@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "PersonEntity",propOrder = {
+@XmlType(name = "PersonSoapEntity",propOrder = {
         "id",
         "firstName",
         "lastName",
@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlType;
         "email",
 })
 @Data
-public class PersonEntity {
+public class PersonSoapEntity {
 
     private Integer id;
     private String firstName;

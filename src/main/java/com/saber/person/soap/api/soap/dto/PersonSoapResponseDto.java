@@ -3,32 +3,31 @@ package com.saber.person.soap.api.soap.dto;
 import lombok.Data;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "PersonResponseDto",propOrder = {
+@XmlType(name = "PersonSoapResponseDto",propOrder = {
         "response",
         "error"
 })
 @Data
-public class PersonResponseDto {
-    private PersonEntity response;
-    private ErrorResponse  error;
+public class PersonSoapResponseDto {
+    private PersonSoapEntity response;
+    private ErrorSoapResponse error;
 
-    public PersonResponseDto() {
+    public PersonSoapResponseDto() {
     }
 
-    public PersonResponseDto(PersonEntity response) {
+    public PersonSoapResponseDto(PersonSoapEntity response) {
         this.response = response;
     }
 
-    public PersonResponseDto(PersonEntity response, ErrorResponse  error) {
+    public PersonSoapResponseDto(PersonSoapEntity response, ErrorSoapResponse error) {
         this.response = response;
         this.error = error;
     }
 
-    public PersonResponseDto(ErrorResponse error) {
+    public PersonSoapResponseDto(ErrorSoapResponse error) {
         this.error = error;
     }
 }

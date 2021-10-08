@@ -1,23 +1,20 @@
 package com.saber.person.soap.api.soap.dto;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.*;
 import javax.xml.bind.annotation.*;
 
 @Data
-@ApiModel(value = "personDto")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "PersonDto",propOrder = {
+@XmlType(name = "PersonSoapDto",propOrder = {
         "firstName",
         "lastName",
         "nationalCode",
         "age",
         "email",
 })
-public class PersonDto {
+public class PersonSoapDto {
     @NotBlank(message = "firstName is Required")
     @XmlElement(name = "firstName",defaultValue = "")
     private String firstName;

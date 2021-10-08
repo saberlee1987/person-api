@@ -6,11 +6,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 @Data
-@XmlType(name = "ValidationDto",propOrder = {
+@XmlType(name = "ValidationSoapDto",propOrder = {
         "fieldName",
         "detailMessage"
 })
-public class ValidationDto {
+public class ValidationSoapDto {
     private String fieldName;
     private String detailMessage;
 }

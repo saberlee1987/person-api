@@ -1,11 +1,11 @@
 package com.saber.person.soap.api.soap.impl;
 
-import com.saber.person.soap.api.dto.*;
+import com.saber.person.soap.api.dto.PersonDto;
+import com.saber.person.soap.api.dto.ResponseDto;
 import com.saber.person.soap.api.entity.PersonEntity;
 import com.saber.person.soap.api.services.PersonService;
 import com.saber.person.soap.api.soap.PersonSoapService;
-import com.saber.person.soap.api.soap.dto.PersonAllResponseDto;
-import com.saber.person.soap.api.soap.dto.PersonResponseDto;
+import com.saber.person.soap.api.soap.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,26 +23,26 @@ public class PersonSoapServiceImpl implements PersonSoapService {
     private final SpringValidatorAdapter validatorAdapter;
 
     @Override
-    public PersonResponseDto addPerson(com.saber.person.soap.api.soap.dto.PersonDto dto) {
+    public PersonSoapResponseDto addPerson(PersonSoapDto dto) {
 
-        Set<ConstraintViolation<com.saber.person.soap.api.soap.dto.PersonDto>> errorValidation = validatorAdapter.validate(dto);
+        Set<ConstraintViolation<PersonSoapDto>> errorValidation = validatorAdapter.validate(dto);
         if (errorValidation.size() > 0) {
-            return new PersonResponseDto(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString(),
+            return new PersonSoapResponseDto(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString(),
                      getValidation(errorValidation)));
         } else {
-            PersonDto personDto = createDto(dto);
-            return new PersonResponseDto(createSoapEntity(this.personService.addPerson(personDto).getResponse()));
+            PersonDto personDto = creatRestDto(dto);
+            return new PersonSoapResponseDto(createSoapEntity(this.personService.addPerson(personDto).getResponse()));
         }
     }
 
     @Override
-    public PersonResponseDto findByNationalCode(String nationalCode) {
-        ResponseDto<PersonEntity> responseDto = new ResponseDto<>();
+    public PersonSoapResponseDto findByNationalCode(String nationalCode) {
+        ResponseDto<PersonSoapEntity> responseDto = new ResponseDto<>();
         if (nationalCode == null || nationalCode.trim().length() < 10 || !nationalCode.trim().matches("\\d+")) {
-            return  new PersonResponseDto(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString()
+            return  new PersonSoapResponseDto(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString()
                     ,  getValidation("nationalCode", "nationalCode invalid")));
         }
-        return new PersonResponseDto(createSoapEntity(this.personService.findByNationalCode(nationalCode).getResponse()));
+        return new PersonSoapResponseDto(createSoapEntity(this.personService.findByNationalCode(nationalCode).getResponse()));
 }
 
     @Override
@@ -50,57 +50,57 @@ public class PersonSoapServiceImpl implements PersonSoapService {
         return new PersonAllResponseDto(createPersons(this.personService.findAll().getResponse().getPersons()));
     }
 
-    private List<com.saber.person.soap.api.soap.dto.ValidationDto> getValidation(Set<ConstraintViolation<com.saber.person.soap.api.soap.dto.PersonDto>> errorValidation) {
-        List<com.saber.person.soap.api.soap.dto.ValidationDto> validations = new ArrayList<>();
-        for (ConstraintViolation<com.saber.person.soap.api.soap.dto.PersonDto> v : errorValidation) {
-            com.saber.person.soap.api.soap.dto.ValidationDto validationDto = new com.saber.person.soap.api.soap.dto.ValidationDto();
-            validationDto.setFieldName(v.getPropertyPath().toString());
-            validationDto.setDetailMessage(v.getMessage());
-            validations.add(validationDto);
+    private List<ValidationSoapDto> getValidation(Set<ConstraintViolation<PersonSoapDto>> errorValidation) {
+        List<ValidationSoapDto> validations = new ArrayList<>();
+        for (ConstraintViolation<PersonSoapDto> v : errorValidation) {
+            ValidationSoapDto validationSoapDto = new ValidationSoapDto();
+            validationSoapDto.setFieldName(v.getPropertyPath().toString());
+            validationSoapDto.setDetailMessage(v.getMessage());
+            validations.add(validationSoapDto);
         }
         return validations;
     }
 
-    private List<com.saber.person.soap.api.soap.dto.ValidationDto> getValidation(String fieldName, String message) {
-        List<com.saber.person.soap.api.soap.dto.ValidationDto> validations = new ArrayList<>();
-        com.saber.person.soap.api.soap.dto.ValidationDto validationDto = new com.saber.person.soap.api.soap.dto.ValidationDto();
-        validationDto.setFieldName(fieldName);
-        validationDto.setDetailMessage(message);
-        validations.add(validationDto);
+    private List<ValidationSoapDto> getValidation(String fieldName, String message) {
+        List<ValidationSoapDto> validations = new ArrayList<>();
+        ValidationSoapDto validationSoapDto = new ValidationSoapDto();
+        validationSoapDto.setFieldName(fieldName);
+        validationSoapDto.setDetailMessage(message);
+        validations.add(validationSoapDto);
         return validations;
     }
 
-    private com.saber.person.soap.api.soap.dto.ErrorResponse getErrorResponse(Integer code, String message, List<com.saber.person.soap.api.soap.dto.ValidationDto> validationDtoList) {
-        com.saber.person.soap.api.soap.dto.ErrorResponse  errorResponse = new com.saber.person.soap.api.soap.dto.ErrorResponse ();
-        errorResponse.setCode(code);
-        errorResponse.setMessage(message);
-        errorResponse.setValidations(validationDtoList);
-        return errorResponse;
+    private ErrorSoapResponse getErrorResponse(Integer code, String message, List<ValidationSoapDto> validationSoapDtoList) {
+        ErrorSoapResponse errorSoapResponse = new ErrorSoapResponse();
+        errorSoapResponse.setCode(code);
+        errorSoapResponse.setMessage(message);
+        errorSoapResponse.setValidations(validationSoapDtoList);
+        return errorSoapResponse;
     }
 
-    private PersonDto createDto(com.saber.person.soap.api.soap.dto.PersonDto personDto){
+    private  PersonDto creatRestDto(PersonSoapDto personSoapDto){
         PersonDto dto = new PersonDto();
-        dto.setFirstName(personDto.getFirstName());
-        dto.setLastName(personDto.getLastName());
-        dto.setNationalCode(personDto.getNationalCode());
-        dto.setEmail(personDto.getEmail());
-        dto.setAge(personDto.getAge());
+        dto.setFirstName(personSoapDto.getFirstName());
+        dto.setLastName(personSoapDto.getLastName());
+        dto.setNationalCode(personSoapDto.getNationalCode());
+        dto.setEmail(personSoapDto.getEmail());
+        dto.setAge(personSoapDto.getAge());
         return dto;
     }
 
-    private com.saber.person.soap.api.soap.dto.PersonEntity createSoapEntity(PersonEntity entity){
-        com.saber.person.soap.api.soap.dto.PersonEntity  personEntity = new com.saber.person.soap.api.soap.dto.PersonEntity ();
-        personEntity.setId(entity.getId());
-        personEntity.setFirstName(entity.getFirstName());
-        personEntity.setLastName(entity.getLastName());
-        personEntity.setNationalCode(entity.getNationalCode());
-        personEntity.setEmail(entity.getEmail());
-        personEntity.setAge(entity.getAge());
-        return personEntity;
+    private PersonSoapEntity createSoapEntity(PersonEntity entity){
+        PersonSoapEntity personSoapEntity = new PersonSoapEntity();
+        personSoapEntity.setId(entity.getId());
+        personSoapEntity.setFirstName(entity.getFirstName());
+        personSoapEntity.setLastName(entity.getLastName());
+        personSoapEntity.setNationalCode(entity.getNationalCode());
+        personSoapEntity.setEmail(entity.getEmail());
+        personSoapEntity.setAge(entity.getAge());
+        return personSoapEntity;
     }
 
-    private List<com.saber.person.soap.api.soap.dto.PersonEntity> createPersons(List<PersonEntity> entities){
-        List<com.saber.person.soap.api.soap.dto.PersonEntity> persons = new ArrayList<>();
+    private List<PersonSoapEntity> createPersons(List<PersonEntity> entities){
+        List<PersonSoapEntity> persons = new ArrayList<>();
         for (PersonEntity entity : entities) {
             persons.add(createSoapEntity(entity));
         }
