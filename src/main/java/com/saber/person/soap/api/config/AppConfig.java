@@ -19,7 +19,8 @@ import java.util.List;
 @Configuration
 @EnableSwagger2
 public class AppConfig {
-    private static final String AUTHORIZATION_HEADER = "Authorization";
+ 	private static final String AUTHORIZATION = "Authorization";
+	private static final String AUTHORIZATION_HEADER = "header";
 
     @Bean
     public ObjectMapper mapper() {
@@ -47,26 +48,26 @@ public class AppConfig {
     }
 
     private List<SecurityScheme> securitySchemeList() {
-        SecurityScheme securityScheme = new ApiKey("Authorization Header", AUTHORIZATION_HEADER, "Authorization Header");
+     SecurityScheme securityScheme = new ApiKey(AUTHORIZATION, AUTHORIZATION, AUTHORIZATION_HEADER);
         return Collections.singletonList(securityScheme);
     }
 
 
     private List<SecurityContext> securityContext() {
-        return Collections.singletonList(SecurityContext.builder().securityReferences(defaultAuth()).build());
+       	return Collections.singletonList(SecurityContext.builder().securityReferences(defaultAuth()).forPaths(PathSelectors.any()).build());
     }
 
     private List<SecurityReference> defaultAuth() {
         AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
-        return Collections.singletonList(new SecurityReference("Authorization Header", authorizationScopes));
+       	return Collections.singletonList(new SecurityReference(AUTHORIZATION, authorizationScopes));
     }
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("Person Service APi")
-                .version("version1.1 1400/07/15")
+                .version("version1.1 1400/07/24")
                 .description("Person Service Api")
                 .build();
     }
