@@ -5,30 +5,31 @@ import lombok.Data;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
+import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "PersonSoapResponse",propOrder = {
+@XmlType(name = "FindAllPersonsResponse",propOrder = {
         "response",
         "error",
 
 })
 @Data
-public class PersonSoapResponse {
-    private PersonSoapEntity response;
+public class FindAllPersonsResponse {
+    private List<PersonSoapEntity> response;
     private ErrorSoapResponse error;
 
-    public PersonSoapResponse() {
+    public FindAllPersonsResponse() {
     }
 
-    public PersonSoapResponse(PersonSoapEntity response) {
+    public FindAllPersonsResponse(List<PersonSoapEntity> response) {
         this.response = response;
     }
 
-    public PersonSoapResponse(ErrorSoapResponse error) {
+    public FindAllPersonsResponse(ErrorSoapResponse error) {
         this.error = error;
     }
 
-    public PersonSoapResponse(PersonSoapEntity response, ErrorSoapResponse error) {
+    public FindAllPersonsResponse(List<PersonSoapEntity> response, ErrorSoapResponse error) {
         this.response = response;
         this.error = error;
     }

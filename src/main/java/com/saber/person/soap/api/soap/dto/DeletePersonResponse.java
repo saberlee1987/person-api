@@ -7,28 +7,28 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "PersonSoapResponse",propOrder = {
+@XmlType(name = "DeletePersonResponse",propOrder = {
         "response",
         "error",
 
 })
 @Data
-public class PersonSoapResponse {
-    private PersonSoapEntity response;
+public class DeletePersonResponse {
+    private DeleteSoapPersonDto response;
     private ErrorSoapResponse error;
 
-    public PersonSoapResponse() {
+    public DeletePersonResponse() {
     }
 
-    public PersonSoapResponse(PersonSoapEntity response) {
+    public DeletePersonResponse(DeleteSoapPersonDto response) {
         this.response = response;
     }
 
-    public PersonSoapResponse(ErrorSoapResponse error) {
+    public DeletePersonResponse(ErrorSoapResponse error) {
         this.error = error;
     }
 
-    public PersonSoapResponse(PersonSoapEntity response, ErrorSoapResponse error) {
+    public DeletePersonResponse(DeleteSoapPersonDto response, ErrorSoapResponse error) {
         this.response = response;
         this.error = error;
     }

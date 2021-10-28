@@ -2,7 +2,6 @@ package com.saber.person.soap.api.soap.dto;
 
 import lombok.Data;
 
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 @Data

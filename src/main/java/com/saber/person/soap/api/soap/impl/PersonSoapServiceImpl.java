@@ -1,10 +1,8 @@
 package com.saber.person.soap.api.soap.impl;
 
-import com.saber.person.soap.api.dto.DeletePersonDto;
-import com.saber.person.soap.api.dto.PersonDto;
 import com.saber.person.soap.api.dto.ResponseDto;
 import com.saber.person.soap.api.entity.PersonEntity;
-import com.saber.person.soap.api.services.PersonService;
+import com.saber.person.soap.api.repositories.PersonRepository;
 import com.saber.person.soap.api.soap.PersonSoapService;
 import com.saber.person.soap.api.soap.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -14,13 +12,14 @@ import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import javax.validation.ConstraintViolation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class PersonSoapServiceImpl implements PersonSoapService {
 
-    private final PersonService personService;
+    private final PersonRepository personRepository;
     private final SpringValidatorAdapter validatorAdapter;
 
     @Override
@@ -29,10 +28,14 @@ public class PersonSoapServiceImpl implements PersonSoapService {
         Set<ConstraintViolation<PersonSoapDto>> errorValidation = validatorAdapter.validate(dto);
         if (errorValidation.size() > 0) {
             return new PersonSoapResponse(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString(),
-                    getValidation(errorValidation)));
+                   null, getValidation(errorValidation)));
         } else {
-            PersonDto personDto = creatRestDto(dto);
-            return new PersonSoapResponse(createSoapEntity(this.personService.addPerson(personDto).getResponse()));
+            PersonEntity entity = createEntity(dto);
+            if (this.personRepository.findByNationalCode(dto.getNationalCode()).isPresent()) {
+                return new PersonSoapResponse(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString(),
+                        String.format("Person with nationalCode %s already exist",dto.getNationalCode()), null));
+            }
+            return new PersonSoapResponse(createSoapEntity(this.personRepository.save(entity)));
         }
     }
 
@@ -41,14 +44,19 @@ public class PersonSoapServiceImpl implements PersonSoapService {
         ResponseDto<PersonSoapEntity> responseDto = new ResponseDto<>();
         if (nationalCode == null || nationalCode.trim().length() < 10 || !nationalCode.trim().matches("\\d+")) {
             return new PersonSoapResponse(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString()
-                    , getValidation("nationalCode", "nationalCode invalid")));
+                   ,null , getValidation("nationalCode", "nationalCode invalid")));
         }
-        return new PersonSoapResponse(createSoapEntity(this.personService.findByNationalCode(nationalCode).getResponse()));
+        Optional<PersonEntity> optionalPersonEntity = this.personRepository.findByNationalCode(nationalCode);
+        if (optionalPersonEntity.isEmpty()){
+            return new PersonSoapResponse(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString(),
+                    String.format("Person with nationalCode %s does not exist",nationalCode),null));
+        }
+        return new PersonSoapResponse(createSoapEntity(optionalPersonEntity.get()));
     }
 
     @Override
-    public PersonSoapResponse findAll() {
-        return new PersonSoapResponse(createPersons(this.personService.findAll().getResponse().getPersons()));
+    public FindAllPersonsResponse findAll() {
+        return new FindAllPersonsResponse(createPersons(this.personRepository.findAll()));
     }
 
     @Override
@@ -56,19 +64,34 @@ public class PersonSoapServiceImpl implements PersonSoapService {
         Set<ConstraintViolation<PersonSoapDto>> errorValidation = validatorAdapter.validate(dto);
         if (errorValidation.size() > 0) {
             return new PersonSoapResponse(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString(),
-                    getValidation(errorValidation)));
+                   null, getValidation(errorValidation)));
         }
-
-        return new PersonSoapResponse(createSoapEntity(this.personService.updatePersonByNationalCode(nationalCode, creatRestDto(dto)).getResponse()));
+        Optional<PersonEntity> optionalPersonEntity = this.personRepository.findByNationalCode(nationalCode);
+        if (optionalPersonEntity.isEmpty()){
+            return new PersonSoapResponse(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString(),
+                    String.format("Person with nationalCode %s does not exist",nationalCode),null));
+        }
+        PersonEntity entity = createEntity(dto);
+        return new PersonSoapResponse(createSoapEntity(this.personRepository.save(entity)));
     }
 
     @Override
-    public PersonSoapResponse deletePersonByNationalCode(String nationalCode) {
+    public DeletePersonResponse deletePersonByNationalCode(String nationalCode) {
         if (nationalCode == null || nationalCode.trim().length() < 10 || !nationalCode.trim().matches("\\d+")) {
-            return new PersonSoapResponse(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString()
-                    , getValidation("nationalCode", "nationalCode invalid")));
+            return new DeletePersonResponse(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString()
+                   ,null , getValidation("nationalCode", "nationalCode invalid")));
         }
-        return new PersonSoapResponse(createDeleteSoapResponseDto(this.personService.deletePersonByNationalCode(nationalCode).getResponse()));
+        Optional<PersonEntity> optionalPersonEntity = this.personRepository.findByNationalCode(nationalCode);
+        if (optionalPersonEntity.isEmpty()){
+            return new DeletePersonResponse(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString(),
+                    String.format("Person with nationalCode %s does not exist",nationalCode),null));
+        }
+        PersonEntity entity = optionalPersonEntity.get();
+        this.personRepository.delete(entity);
+        DeleteSoapPersonDto deleteSoapPersonDto = new DeleteSoapPersonDto();
+        deleteSoapPersonDto.setCode(0);
+        deleteSoapPersonDto.setText("The operation was carried out successfully");
+        return new DeletePersonResponse(deleteSoapPersonDto);
     }
 
     private List<ValidationSoapDto> getValidation(Set<ConstraintViolation<PersonSoapDto>> errorValidation) {
@@ -91,22 +114,23 @@ public class PersonSoapServiceImpl implements PersonSoapService {
         return validations;
     }
 
-    private ErrorSoapResponse getErrorResponse(Integer code, String message, List<ValidationSoapDto> validationSoapDtoList) {
+    private ErrorSoapResponse getErrorResponse(Integer code, String message, String originalMessage,List<ValidationSoapDto> validationSoapDtoList) {
         ErrorSoapResponse errorSoapResponse = new ErrorSoapResponse();
         errorSoapResponse.setCode(code);
         errorSoapResponse.setMessage(message);
+        errorSoapResponse.setOriginalMessage(originalMessage);
         errorSoapResponse.setValidations(validationSoapDtoList);
         return errorSoapResponse;
     }
 
-    private PersonDto creatRestDto(PersonSoapDto personSoapDto) {
-        PersonDto dto = new PersonDto();
-        dto.setFirstName(personSoapDto.getFirstName());
-        dto.setLastName(personSoapDto.getLastName());
-        dto.setNationalCode(personSoapDto.getNationalCode());
-        dto.setEmail(personSoapDto.getEmail());
-        dto.setAge(personSoapDto.getAge());
-        return dto;
+    private PersonEntity createEntity(PersonSoapDto personSoapDto) {
+        PersonEntity entity = new PersonEntity();
+        entity.setFirstName(personSoapDto.getFirstName());
+        entity.setLastName(personSoapDto.getLastName());
+        entity.setNationalCode(personSoapDto.getNationalCode());
+        entity.setEmail(personSoapDto.getEmail());
+        entity.setAge(personSoapDto.getAge());
+        return entity;
     }
 
     private PersonSoapEntity createSoapEntity(PersonEntity entity) {
@@ -120,12 +144,6 @@ public class PersonSoapServiceImpl implements PersonSoapService {
         return personSoapEntity;
     }
 
-    private DeleteSoapPersonDto createDeleteSoapResponseDto(DeletePersonDto dto) {
-        DeleteSoapPersonDto deleteSoapPersonDto = new DeleteSoapPersonDto();
-        deleteSoapPersonDto.setCode(dto.getCode());
-        deleteSoapPersonDto.setText(dto.getText());
-        return deleteSoapPersonDto;
-    }
 
     private List<PersonSoapEntity> createPersons(List<PersonEntity> entities) {
         List<PersonSoapEntity> persons = new ArrayList<>();

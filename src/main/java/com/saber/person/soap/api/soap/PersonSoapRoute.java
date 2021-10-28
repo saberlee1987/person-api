@@ -1,20 +1,17 @@
 package com.saber.person.soap.api.soap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.saber.person.soap.api.soap.dto.ErrorSoapResponse;
-import com.saber.person.soap.api.soap.dto.PersonSoapDto;
-import com.saber.person.soap.api.soap.dto.PersonSoapResponse;
+import com.saber.person.soap.api.soap.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
+import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.cxf.common.message.CxfConstants;
 import org.apache.cxf.message.MessageContentsList;
 import org.springframework.http.HttpStatus;
 
-//@Component
 @Slf4j
-public class PersonSoapRoute extends AbstractRestRoute {
+public class PersonSoapRoute extends RouteBuilder {
     private String url;
-
     private final PersonSoapService personSoapService;
     private final ObjectMapper mapper;
 
@@ -28,8 +25,6 @@ public class PersonSoapRoute extends AbstractRestRoute {
     @Override
     public void configure() throws Exception {
 
-        super.configure();
-
         from(url)
                 .choice()
                 .when(header(CxfConstants.OPERATION_NAME).isEqualTo("AddPerson"))
@@ -39,7 +34,7 @@ public class PersonSoapRoute extends AbstractRestRoute {
                     log.info("Request for addPerson ====> {}", mapper.writeValueAsString(dto));
 
                     PersonSoapResponse response = personSoapService.addPerson(dto);
-                    if (response.getPerson() != null) {
+                    if (response.getResponse() != null) {
                         log.info("Response  for addPerson with statusCode {} ====> {}"
                                 , HttpStatus.OK.value()
                                 , mapper.writeValueAsString(response));
@@ -62,7 +57,7 @@ public class PersonSoapRoute extends AbstractRestRoute {
                         log.info("Request for addPerson ====> {}", mapper.writeValueAsString(dto));
 
                         response = personSoapService.updatePersonByNationalCode(nationalCode, dto);
-                        if (response.getPerson() != null) {
+                        if (response.getResponse() != null) {
                             log.info("Response  for addPerson with statusCode {} ====> {}"
                                     , HttpStatus.OK.value()
                                     , mapper.writeValueAsString(response));
@@ -86,7 +81,7 @@ public class PersonSoapRoute extends AbstractRestRoute {
                     String nationalCode = exchange.getIn().getBody(String.class);
                     log.info("Request for FindByNationalCode ====> {}", nationalCode);
                     PersonSoapResponse response = personSoapService.findByNationalCode(nationalCode);
-                    if (response.getPerson() != null) {
+                    if (response.getResponse() != null) {
                         log.info("Response  for FindByNationalCode with statusCode {} ====> {}"
                                 , HttpStatus.OK.value()
                                 , mapper.writeValueAsString(response));
@@ -103,8 +98,8 @@ public class PersonSoapRoute extends AbstractRestRoute {
                 .process(exchange -> {
                     String nationalCode = exchange.getIn().getBody(String.class);
                     log.info("Request for DeletePersonByNationalCode ====> {}", nationalCode);
-                    PersonSoapResponse response = personSoapService.deletePersonByNationalCode(nationalCode);
-                    if (response.getDeleteSoapPersonDto() != null) {
+                    DeletePersonResponse response = personSoapService.deletePersonByNationalCode(nationalCode);
+                    if (response.getResponse() != null) {
                         log.info("Response  for DeletePersonByNationalCode with statusCode {} ====> {}"
                                 , HttpStatus.OK.value()
                                 , mapper.writeValueAsString(response));
@@ -119,7 +114,7 @@ public class PersonSoapRoute extends AbstractRestRoute {
                 .when(header(CxfConstants.OPERATION_NAME).isEqualTo("FindAll"))
                 .removeHeaders("*")
                 .process(exchange -> {
-                    PersonSoapResponse response = this.personSoapService.findAll();
+                    FindAllPersonsResponse response = this.personSoapService.findAll();
                     log.info("Response  for FindAll with statusCode {} ====> {}"
                             , HttpStatus.OK.value()
                             , mapper.writeValueAsString(response));

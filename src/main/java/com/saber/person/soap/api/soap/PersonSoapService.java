@@ -14,23 +14,23 @@ import javax.xml.bind.annotation.XmlElement;
 public interface PersonSoapService {
 
     @WebMethod(operationName = "AddPerson",action = "AddPerson")
-    @WebResult(name = "PersonSoapResponseDto")
+    @WebResult(name = "PersonSoapResponse")
     PersonSoapResponse addPerson(@WebParam(name = "personDto") @XmlElement(required = true) PersonSoapDto dto);
 
     @WebMethod(operationName = "FindByNationalCode",action = "FindByNationalCode")
-    @WebResult(name = "PersonSoapResponseDto")
+    @WebResult(name = "PersonSoapResponse")
     PersonSoapResponse findByNationalCode(@WebParam(name = "nationalCode") @XmlElement(required = true,defaultValue = "") String nationalCode);
 
 
     @WebMethod(operationName = "FindAll",action = "FindAll")
-    @WebResult(name = "PersonAllResponseDto")
-    PersonSoapResponse findAll();
+    @WebResult(name = "FindAllPersonsResponse")
+    FindAllPersonsResponse findAll();
 
     @WebMethod(operationName = "UpdatePersonByNationalCode",action = "UpdatePersonByNationalCode")
-    @WebResult(name = "PersonSoapResponseDto")
+    @WebResult(name = "PersonSoapResponse")
     PersonSoapResponse updatePersonByNationalCode(@WebParam(name = "nationalCode") @XmlElement(required = true,defaultValue = "")String nationalCode,@WebParam(name = "personDto") @XmlElement(required = true) PersonSoapDto dto);
 
     @WebMethod(operationName = "DeletePersonByNationalCode",action = "DeletePersonByNationalCode")
-    @WebResult(name = "DeletePersonSoapResponseDto")
-    PersonSoapResponse deletePersonByNationalCode(@WebParam(name = "nationalCode") @XmlElement(required = true,defaultValue = "")String nationalCode);
+    @WebResult(name = "DeletePersonResponse")
+    DeletePersonResponse deletePersonByNationalCode(@WebParam(name = "nationalCode") @XmlElement(required = true,defaultValue = "")String nationalCode);
 }
