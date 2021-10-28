@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "spring.c3p0.initialPoolSize",
+      "type": "java.lang.String",
+      "description": "Description for spring.c3p0.initialPoolSize."
+  }
+] }

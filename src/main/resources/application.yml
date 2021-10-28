@@ -30,18 +30,37 @@ cxf:
 spring:
   application:
     name: person-service
-  datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:person
-    username: sa
-    password: sa
-    hikari:
-      maximum-pool-size: 100
-      minimum-idle: 35
-      max-lifetime: 10000
-      idle-timeout: 8000
-      connection-timeout: 8000
-      initialization-fail-timeout: 8000
+  #  datasource:
+  #    driver-class-name: org.h2.Driver
+  #    url: jdbc:h2:mem:person
+  #    username: sa
+  #    password: sa
+  #    hikari:
+  #      maximum-pool-size: 100
+  #      minimum-idle: 35
+  #      max-lifetime: 10000
+  #      idle-timeout: 8000
+  #      connection-timeout: 8000
+  #      initialization-fail-timeout: 8000
+  c3p0:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test2
+    username: saber66
+    password: AdminSaber66
+    minPoolSize: 40
+    maxPoolSize: 100
+    initialPoolSize: 50
+    acquireIncrement: 10
+    acquireRetryDelay: 600
+    checkTimeout: 10000
+    maxConnectionAge: 30
+    maxIdleTimeout: 30
+    maxStatementPerConnection: 100
+    idleConnectionTestPeriod: 180
+    testConnectionOnCheckout: false
+    testConnectionOnCheckin: true
+    numHelperThreads: 100
+    preferredTestQuery: 'SELECT 1'
   jpa:
     generate-ddl: false
     hibernate:
@@ -49,7 +68,7 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       ddl-auto: update
     show-sql: true
-    database: h2
+    database: mysql
     properties:
       hibernate:
         show_sql: true

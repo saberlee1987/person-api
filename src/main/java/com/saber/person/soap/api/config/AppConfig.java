@@ -4,8 +4,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -14,6 +17,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import java.beans.PropertyVetoException;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,7 +26,34 @@ import java.util.List;
 public class AppConfig {
     private static final String AUTHORIZATION = "Authorization";
     private static final String AUTHORIZATION_HEADER = "header";
+    @Autowired
+    private ComboPoolDataSourceConfig comboConfig;
 
+    @Bean(value = "personDataSource")
+    @Primary
+    public ComboPooledDataSource dataSource() throws PropertyVetoException {
+        ComboPooledDataSource dataSource =new ComboPooledDataSource();
+        dataSource.setDriverClass(comboConfig.getDriverClassName());
+        dataSource.setJdbcUrl(comboConfig.getUrl());
+        dataSource.setUser(comboConfig.getUsername());
+        dataSource.setPassword(comboConfig.getPassword());
+
+        dataSource.setPreferredTestQuery(comboConfig.getPreferredTestQuery());
+        dataSource.setMinPoolSize(comboConfig.getMinPoolSize());
+        dataSource.setMaxPoolSize(comboConfig.getMaxPoolSize());
+        dataSource.setAcquireIncrement(comboConfig.getAcquireIncrement());
+        dataSource.setCheckoutTimeout(comboConfig.getCheckTimeout());
+        dataSource.setInitialPoolSize(comboConfig.getInitialPoolSize());
+        dataSource.setAcquireRetryDelay(comboConfig.getAcquireRetryDelay());
+        dataSource.setMaxConnectionAge(comboConfig.getMaxConnectionAge());
+        dataSource.setMaxIdleTime(comboConfig.getMaxIdleTimeout());
+        dataSource.setMaxStatementsPerConnection(comboConfig.getMaxStatementPerConnection());
+        dataSource.setIdleConnectionTestPeriod(comboConfig.getIdleConnectionTestPeriod());
+        dataSource.setTestConnectionOnCheckout(comboConfig.isTestConnectionOnCheckout());
+        dataSource.setTestConnectionOnCheckin(comboConfig.isTestConnectionOnCheckin());
+        dataSource.setNumHelperThreads(comboConfig.getNumHelperThreads());
+        return dataSource;
+    }
     @Bean
     public ObjectMapper mapper() {
         ObjectMapper mapper = new ObjectMapper();
