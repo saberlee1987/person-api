@@ -25,6 +25,9 @@ springfox:
 
 cxf:
   path: /soapServices
+  endpoint: /personSoap
+  host: localhost
+  soapGatewayPort: 8000
 
 
 spring:

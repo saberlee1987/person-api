@@ -10,9 +10,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 
-@Component
 @Slf4j
 public class AbstractRestRoute extends RouteBuilder {
 

@@ -1,28 +1,30 @@
 package com.saber.person.soap.api.soap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.saber.person.soap.api.soap.dto.*;
+import com.saber.person.soap.api.soap.dto.ErrorSoapResponse;
+import com.saber.person.soap.api.soap.dto.PersonSoapDto;
+import com.saber.person.soap.api.soap.dto.PersonSoapResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.cxf.common.message.CxfConstants;
 import org.apache.cxf.message.MessageContentsList;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 @Slf4j
 public class PersonSoapRoute extends AbstractRestRoute {
-    private final String url;
+    private String url;
 
     private final PersonSoapService personSoapService;
     private final ObjectMapper mapper;
 
     public PersonSoapRoute(PersonSoapService personSoapService, ObjectMapper mapper) {
-        this.url = String.format("cxf:/personSoap?serviceClass=%s", PersonSoapService.class.getName());
         this.personSoapService = personSoapService;
         this.mapper = mapper;
     }
-
+    public void setUrl(String url) {
+        this.url = url;
+    }
     @Override
     public void configure() throws Exception {
 
@@ -59,7 +61,7 @@ public class PersonSoapRoute extends AbstractRestRoute {
                         PersonSoapDto dto = (PersonSoapDto) messageContentsList.get(1);
                         log.info("Request for addPerson ====> {}", mapper.writeValueAsString(dto));
 
-                        response = personSoapService.updatePersonByNationalCode(nationalCode,dto);
+                        response = personSoapService.updatePersonByNationalCode(nationalCode, dto);
                         if (response.getPerson() != null) {
                             log.info("Response  for addPerson with statusCode {} ====> {}"
                                     , HttpStatus.OK.value()
