@@ -20,8 +20,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @ControllerAdvice
 @RequiredArgsConstructor
@@ -38,7 +41,7 @@ public class PersonControllerAdviser extends ResponseEntityExceptionHandler {
         errorResponse.setCode(HttpStatus.BAD_REQUEST.value());
         errorResponse.setMessage(HttpStatus.BAD_REQUEST.toString());
         errorResponse.setOriginalMessage(String.format("{\"code\":%d,\"message\":\"%s\"}",
-                HttpStatus.BAD_REQUEST.value(),exception.getMessage()));
+                HttpStatus.BAD_REQUEST.value(), exception.getMessage()));
         responseDto.setError(errorResponse);
         try {
             log.error("ResourceDuplicationException error ====> {}", mapper.writeValueAsString(responseDto));
@@ -56,7 +59,7 @@ public class PersonControllerAdviser extends ResponseEntityExceptionHandler {
         errorResponse.setCode(HttpStatus.NOT_ACCEPTABLE.value());
         errorResponse.setMessage(HttpStatus.NOT_ACCEPTABLE.toString());
         errorResponse.setOriginalMessage(String.format("{\"code\":%d,\"message\":\"%s\"}",
-                HttpStatus.NOT_ACCEPTABLE.value(),exception.getMessage()));
+                HttpStatus.NOT_ACCEPTABLE.value(), exception.getMessage()));
         responseDto.setError(errorResponse);
         try {
             log.error("ResourceNotFoundException error ====> {}", mapper.writeValueAsString(responseDto));
@@ -100,7 +103,7 @@ public class PersonControllerAdviser extends ResponseEntityExceptionHandler {
         errorResponse.setMessage(HttpStatus.BAD_REQUEST.toString());
 
         List<ValidationDto> validationDtoList = new ArrayList<>();
-        List<FieldError> fieldErrors =ex.getFieldErrors();
+        List<FieldError> fieldErrors = ex.getFieldErrors();
         for (FieldError fieldError : fieldErrors) {
             ValidationDto validationDto = new ValidationDto();
             validationDto.setFieldName(fieldError.getField());
@@ -125,7 +128,7 @@ public class PersonControllerAdviser extends ResponseEntityExceptionHandler {
         errorResponse.setCode(HttpStatus.BAD_REQUEST.value());
         errorResponse.setMessage(HttpStatus.BAD_REQUEST.toString());
         errorResponse.setOriginalMessage(String.format("{\"code\":%d,\"message\":\"%s\"}",
-                HttpStatus.BAD_REQUEST.value(),ex.getMessage()));
+                HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
         responseDto.setError(errorResponse);
         try {
             log.error("handleMissingServletRequestParameter error ====> {}", mapper.writeValueAsString(responseDto));
@@ -144,7 +147,7 @@ public class PersonControllerAdviser extends ResponseEntityExceptionHandler {
         errorResponse.setMessage(HttpStatus.BAD_REQUEST.toString());
 
         List<ValidationDto> validationDtoList = new ArrayList<>();
-        List<FieldError> fieldErrors =ex.getFieldErrors();
+        List<FieldError> fieldErrors = ex.getFieldErrors();
         for (FieldError fieldError : fieldErrors) {
             ValidationDto validationDto = new ValidationDto();
             validationDto.setFieldName(fieldError.getField());
@@ -157,6 +160,35 @@ public class PersonControllerAdviser extends ResponseEntityExceptionHandler {
             log.error("handleMethodArgumentNotValid error ====> {}", mapper.writeValueAsString(responseDto));
         } catch (Exception e) {
             log.error("handleMethodArgumentNotValid error ====> {}", responseDto);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDto);
+    }
+
+    @ExceptionHandler(value = ConstraintViolationException.class)
+    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
+
+        log.error("handleConstraintViolationException error ====> {}", ex.getMessage());
+        ResponseDto<?> responseDto = new ResponseDto<>();
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setCode(HttpStatus.BAD_REQUEST.value());
+        errorResponse.setMessage(HttpStatus.BAD_REQUEST.toString());
+
+        List<ValidationDto> validationDtoList = new ArrayList<>();
+        ValidationDto validationDto = new ValidationDto();
+        Set<ConstraintViolation<?>> constraintViolations = ex.getConstraintViolations();
+        for (ConstraintViolation<?> v : constraintViolations) {
+            ValidationDto validationDtoClone = validationDto.clone();
+            validationDtoClone.setFieldName(v.getPropertyPath().toString());
+            validationDtoClone.setDetailMessage(v.getMessage());
+            validationDtoList.add(validationDtoClone);
+        }
+
+        errorResponse.setValidations(validationDtoList);
+        responseDto.setError(errorResponse);
+        try {
+            log.error("handleMissingPathVariable error ====> {}", mapper.writeValueAsString(responseDto));
+        } catch (Exception e) {
+            log.error("handleMissingPathVariable error ====> {}", responseDto);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDto);
     }

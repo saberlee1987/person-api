@@ -1,5 +1,6 @@
 package com.saber.person.soap.api.services.impl;
 
+import com.saber.person.soap.api.dto.DeletePersonDto;
 import com.saber.person.soap.api.dto.PersonDto;
 import com.saber.person.soap.api.dto.PersonResponse;
 import com.saber.person.soap.api.dto.ResponseDto;
@@ -9,6 +10,7 @@ import com.saber.person.soap.api.exceptions.ResourceNotFoundException;
 import com.saber.person.soap.api.repositories.PersonRepository;
 import com.saber.person.soap.api.services.PersonService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +29,7 @@ public class PersonServiceImpl implements PersonService {
             throw new ResourceDuplicationException(String.format("Person with nationalCode %s exist"
                     , dto.getNationalCode()));
         }
+        removeWhiteSpace(dto);
         PersonEntity entity = creatEntity(dto);
         return new ResponseDto<>(this.personRepository.save(entity));
     }
@@ -37,7 +40,7 @@ public class PersonServiceImpl implements PersonService {
         List<PersonEntity> persons = this.personRepository.findAll();
         PersonResponse personResponse = new PersonResponse();
         personResponse.setPersons(persons);
-        return  new ResponseDto<>(personResponse);
+        return new ResponseDto<>(personResponse);
     }
 
     @Override
@@ -51,6 +54,34 @@ public class PersonServiceImpl implements PersonService {
         return new ResponseDto<>(optionalPersonEntity.get());
     }
 
+    @Override
+    public ResponseDto<PersonEntity> updatePersonByNationalCode(String nationalCode, PersonDto dto) {
+        Optional<PersonEntity> optionalPersonEntity = this.personRepository.findByNationalCode(nationalCode);
+        if (optionalPersonEntity.isEmpty()) {
+            throw new ResourceNotFoundException(String.format("Person with nationalCode %s does not exist"
+                    , nationalCode));
+        }
+        removeWhiteSpace(dto);
+        PersonEntity personEntity = optionalPersonEntity.get();
+        personEntity.setFirstName(dto.getFirstName());
+        personEntity.setLastName(dto.getLastName());
+        personEntity.setAge(dto.getAge());
+        personEntity.setEmail(dto.getEmail());
+        return new ResponseDto<>(this.personRepository.save(personEntity));
+    }
+
+    @Override
+    public ResponseDto<DeletePersonDto> deletePersonByNationalCode(String nationalCode) {
+        Optional<PersonEntity> optionalPersonEntity = this.personRepository.findByNationalCode(nationalCode);
+        if (optionalPersonEntity.isEmpty()) {
+            throw new ResourceNotFoundException(String.format("Person with nationalCode %s does not exist"
+                    , nationalCode));
+        }
+        PersonEntity personEntity = optionalPersonEntity.get();
+        this.personRepository.delete(personEntity);
+       return new ResponseDto<>(new DeletePersonDto(0,"successfully"));
+    }
+
     private PersonEntity creatEntity(PersonDto dto) {
         PersonEntity entity = new PersonEntity();
         entity.setFirstName(dto.getFirstName());
@@ -59,5 +90,11 @@ public class PersonServiceImpl implements PersonService {
         entity.setNationalCode(dto.getNationalCode());
         entity.setAge(dto.getAge());
         return entity;
+    }
+
+    private void removeWhiteSpace(PersonDto dto){
+        dto.setFirstName(StringUtils.deleteWhitespace(dto.getFirstName()));
+        dto.setLastName(StringUtils.deleteWhitespace(dto.getLastName()));
+        dto.setEmail(StringUtils.deleteWhitespace(dto.getEmail()));
     }
 }

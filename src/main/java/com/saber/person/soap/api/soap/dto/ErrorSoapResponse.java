@@ -1,6 +1,8 @@
 package com.saber.person.soap.api.soap.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -16,6 +18,8 @@ import java.util.List;
 
 })
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ErrorSoapResponse {
     private Integer code;
     private String message;

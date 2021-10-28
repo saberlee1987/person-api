@@ -1,12 +1,11 @@
 package com.saber.person.soap.api.soap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.saber.person.soap.api.soap.dto.PersonAllResponseDto;
-import com.saber.person.soap.api.soap.dto.PersonSoapDto;
-import com.saber.person.soap.api.soap.dto.PersonSoapResponseDto;
+import com.saber.person.soap.api.soap.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.cxf.common.message.CxfConstants;
+import org.apache.cxf.message.MessageContentsList;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -37,8 +36,8 @@ public class PersonSoapRoute extends AbstractRestRoute {
                     PersonSoapDto dto = exchange.getIn().getBody(PersonSoapDto.class);
                     log.info("Request for addPerson ====> {}", mapper.writeValueAsString(dto));
 
-                    PersonSoapResponseDto response = personSoapService.addPerson(dto);
-                    if (response.getResponse() != null) {
+                    PersonSoapResponse response = personSoapService.addPerson(dto);
+                    if (response.getPerson() != null) {
                         log.info("Response  for addPerson with statusCode {} ====> {}"
                                 , HttpStatus.OK.value()
                                 , mapper.writeValueAsString(response));
@@ -50,13 +49,42 @@ public class PersonSoapRoute extends AbstractRestRoute {
                     }
                     exchange.getMessage().setBody(response);
                 })
+                .when(header(CxfConstants.OPERATION_NAME).isEqualTo("UpdatePersonByNationalCode"))
+                .removeHeaders("*")
+                .process(exchange -> {
+                    MessageContentsList messageContentsList = exchange.getIn().getBody(MessageContentsList.class);
+                    PersonSoapResponse response;
+                    if (messageContentsList.size() == 2) {
+                        String nationalCode = (String) messageContentsList.get(0);
+                        PersonSoapDto dto = (PersonSoapDto) messageContentsList.get(1);
+                        log.info("Request for addPerson ====> {}", mapper.writeValueAsString(dto));
+
+                        response = personSoapService.updatePersonByNationalCode(nationalCode,dto);
+                        if (response.getPerson() != null) {
+                            log.info("Response  for addPerson with statusCode {} ====> {}"
+                                    , HttpStatus.OK.value()
+                                    , mapper.writeValueAsString(response));
+
+                        } else {
+                            log.error("Error  for addPerson with statusCode {} ====> {}"
+                                    , response.getError().getCode()
+                                    , mapper.writeValueAsString(response.getError()));
+                        }
+
+                    } else {
+                        response = new PersonSoapResponse(new ErrorSoapResponse(
+                                400, "BAD_REQUEST", "Please send 2 parameters for updatePerson", null
+                        ));
+                    }
+                    exchange.getMessage().setBody(response);
+                })
                 .when(header(CxfConstants.OPERATION_NAME).isEqualTo("FindByNationalCode"))
                 .removeHeaders("*")
                 .process(exchange -> {
                     String nationalCode = exchange.getIn().getBody(String.class);
                     log.info("Request for FindByNationalCode ====> {}", nationalCode);
-                    PersonSoapResponseDto response = personSoapService.findByNationalCode(nationalCode);
-                    if (response.getResponse() != null) {
+                    PersonSoapResponse response = personSoapService.findByNationalCode(nationalCode);
+                    if (response.getPerson() != null) {
                         log.info("Response  for FindByNationalCode with statusCode {} ====> {}"
                                 , HttpStatus.OK.value()
                                 , mapper.writeValueAsString(response));
@@ -68,10 +96,28 @@ public class PersonSoapRoute extends AbstractRestRoute {
                     }
                     exchange.getMessage().setBody(response);
                 })
+                .when(header(CxfConstants.OPERATION_NAME).isEqualTo("DeletePersonByNationalCode"))
+                .removeHeaders("*")
+                .process(exchange -> {
+                    String nationalCode = exchange.getIn().getBody(String.class);
+                    log.info("Request for DeletePersonByNationalCode ====> {}", nationalCode);
+                    PersonSoapResponse response = personSoapService.deletePersonByNationalCode(nationalCode);
+                    if (response.getDeleteSoapPersonDto() != null) {
+                        log.info("Response  for DeletePersonByNationalCode with statusCode {} ====> {}"
+                                , HttpStatus.OK.value()
+                                , mapper.writeValueAsString(response));
+
+                    } else {
+                        log.error("Error  for DeletePersonByNationalCode with statusCode {} ====> {}"
+                                , response.getError().getCode()
+                                , mapper.writeValueAsString(response));
+                    }
+                    exchange.getMessage().setBody(response);
+                })
                 .when(header(CxfConstants.OPERATION_NAME).isEqualTo("FindAll"))
                 .removeHeaders("*")
                 .process(exchange -> {
-                    PersonAllResponseDto response = this.personSoapService.findAll();
+                    PersonSoapResponse response = this.personSoapService.findAll();
                     log.info("Response  for FindAll with statusCode {} ====> {}"
                             , HttpStatus.OK.value()
                             , mapper.writeValueAsString(response));
@@ -79,7 +125,7 @@ public class PersonSoapRoute extends AbstractRestRoute {
                 })
                 .endChoice()
                 .end()
-                .setHeader(Exchange.HTTP_RESPONSE_CODE,constant(200))
+                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200))
                 .log("Service called .............. ");
     }
 }

@@ -1,5 +1,6 @@
 package com.saber.person.soap.api.config;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -19,8 +20,8 @@ import java.util.List;
 @Configuration
 @EnableSwagger2
 public class AppConfig {
- 	private static final String AUTHORIZATION = "Authorization";
-	private static final String AUTHORIZATION_HEADER = "header";
+    private static final String AUTHORIZATION = "Authorization";
+    private static final String AUTHORIZATION_HEADER = "header";
 
     @Bean
     public ObjectMapper mapper() {
@@ -32,8 +33,11 @@ public class AppConfig {
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
         return mapper;
     }
+
 
     @Bean
     public Docket docket() {
@@ -67,7 +71,7 @@ public class AppConfig {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("Person Service APi")
-                .version("version1.1 1400/07/24")
+                .version("version1.1 1400/08/05")
                 .description("Person Service Api")
                 .build();
     }

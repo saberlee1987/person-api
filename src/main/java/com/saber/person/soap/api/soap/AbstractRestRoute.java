@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saber.person.soap.api.exceptions.ResourceDuplicationException;
 import com.saber.person.soap.api.exceptions.ResourceNotFoundException;
 import com.saber.person.soap.api.soap.dto.ErrorSoapResponse;
-import com.saber.person.soap.api.soap.dto.PersonSoapResponseDto;
+import com.saber.person.soap.api.soap.dto.PersonSoapResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
@@ -29,8 +29,8 @@ public class AbstractRestRoute extends RouteBuilder {
                     ResourceDuplicationException ex = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, ResourceDuplicationException.class);
                     log.error("Error ResourceDuplicationException ====> {}", ex.getMessage());
 
-                    PersonSoapResponseDto responseDto = new PersonSoapResponseDto((getErrorResponse(HttpStatus.BAD_REQUEST.value(),
-                            HttpStatus.BAD_REQUEST.toString(), ex.getMessage())));
+                    PersonSoapResponse responseDto = new PersonSoapResponse(getErrorResponse(HttpStatus.BAD_REQUEST.value(),
+                            HttpStatus.BAD_REQUEST.toString(), ex.getMessage()));
                     log.error("Error for ResourceDuplicationException ===> {}", mapper.writeValueAsString(responseDto));
                     exchange.getMessage().setBody(responseDto);
                 })
@@ -43,8 +43,8 @@ public class AbstractRestRoute extends RouteBuilder {
                 .process(exchange -> {
                     ResourceNotFoundException ex = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, ResourceNotFoundException.class);
                     log.error("Error ResourceNotFoundException ====> {}", ex.getMessage());
-                    PersonSoapResponseDto responseDto = new PersonSoapResponseDto((getErrorResponse(HttpStatus.NOT_ACCEPTABLE.value(),
-                            HttpStatus.NOT_ACCEPTABLE.toString(), ex.getMessage())));
+                    PersonSoapResponse responseDto = new PersonSoapResponse(getErrorResponse(HttpStatus.NOT_ACCEPTABLE.value(),
+                            HttpStatus.NOT_ACCEPTABLE.toString(), ex.getMessage()));
                     log.error("Error for ResourceNotFoundException ===> {}", mapper.writeValueAsString(responseDto));
                     exchange.getMessage().setBody(responseDto);
                 })

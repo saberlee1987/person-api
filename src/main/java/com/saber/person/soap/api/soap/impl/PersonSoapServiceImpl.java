@@ -1,5 +1,6 @@
 package com.saber.person.soap.api.soap.impl;
 
+import com.saber.person.soap.api.dto.DeletePersonDto;
 import com.saber.person.soap.api.dto.PersonDto;
 import com.saber.person.soap.api.dto.ResponseDto;
 import com.saber.person.soap.api.entity.PersonEntity;
@@ -23,31 +24,51 @@ public class PersonSoapServiceImpl implements PersonSoapService {
     private final SpringValidatorAdapter validatorAdapter;
 
     @Override
-    public PersonSoapResponseDto addPerson(PersonSoapDto dto) {
+    public PersonSoapResponse addPerson(PersonSoapDto dto) {
 
         Set<ConstraintViolation<PersonSoapDto>> errorValidation = validatorAdapter.validate(dto);
         if (errorValidation.size() > 0) {
-            return new PersonSoapResponseDto(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString(),
-                     getValidation(errorValidation)));
+            return new PersonSoapResponse(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString(),
+                    getValidation(errorValidation)));
         } else {
             PersonDto personDto = creatRestDto(dto);
-            return new PersonSoapResponseDto(createSoapEntity(this.personService.addPerson(personDto).getResponse()));
+            return new PersonSoapResponse(createSoapEntity(this.personService.addPerson(personDto).getResponse()));
         }
     }
 
     @Override
-    public PersonSoapResponseDto findByNationalCode(String nationalCode) {
+    public PersonSoapResponse findByNationalCode(String nationalCode) {
         ResponseDto<PersonSoapEntity> responseDto = new ResponseDto<>();
         if (nationalCode == null || nationalCode.trim().length() < 10 || !nationalCode.trim().matches("\\d+")) {
-            return  new PersonSoapResponseDto(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString()
-                    ,  getValidation("nationalCode", "nationalCode invalid")));
+            return new PersonSoapResponse(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString()
+                    , getValidation("nationalCode", "nationalCode invalid")));
         }
-        return new PersonSoapResponseDto(createSoapEntity(this.personService.findByNationalCode(nationalCode).getResponse()));
-}
+        return new PersonSoapResponse(createSoapEntity(this.personService.findByNationalCode(nationalCode).getResponse()));
+    }
 
     @Override
-    public PersonAllResponseDto findAll() {
-        return new PersonAllResponseDto(createPersons(this.personService.findAll().getResponse().getPersons()));
+    public PersonSoapResponse findAll() {
+        return new PersonSoapResponse(createPersons(this.personService.findAll().getResponse().getPersons()));
+    }
+
+    @Override
+    public PersonSoapResponse updatePersonByNationalCode(String nationalCode, PersonSoapDto dto) {
+        Set<ConstraintViolation<PersonSoapDto>> errorValidation = validatorAdapter.validate(dto);
+        if (errorValidation.size() > 0) {
+            return new PersonSoapResponse(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString(),
+                    getValidation(errorValidation)));
+        }
+
+        return new PersonSoapResponse(createSoapEntity(this.personService.updatePersonByNationalCode(nationalCode, creatRestDto(dto)).getResponse()));
+    }
+
+    @Override
+    public PersonSoapResponse deletePersonByNationalCode(String nationalCode) {
+        if (nationalCode == null || nationalCode.trim().length() < 10 || !nationalCode.trim().matches("\\d+")) {
+            return new PersonSoapResponse(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString()
+                    , getValidation("nationalCode", "nationalCode invalid")));
+        }
+        return new PersonSoapResponse(createDeleteSoapResponseDto(this.personService.deletePersonByNationalCode(nationalCode).getResponse()));
     }
 
     private List<ValidationSoapDto> getValidation(Set<ConstraintViolation<PersonSoapDto>> errorValidation) {
@@ -78,7 +99,7 @@ public class PersonSoapServiceImpl implements PersonSoapService {
         return errorSoapResponse;
     }
 
-    private  PersonDto creatRestDto(PersonSoapDto personSoapDto){
+    private PersonDto creatRestDto(PersonSoapDto personSoapDto) {
         PersonDto dto = new PersonDto();
         dto.setFirstName(personSoapDto.getFirstName());
         dto.setLastName(personSoapDto.getLastName());
@@ -88,7 +109,7 @@ public class PersonSoapServiceImpl implements PersonSoapService {
         return dto;
     }
 
-    private PersonSoapEntity createSoapEntity(PersonEntity entity){
+    private PersonSoapEntity createSoapEntity(PersonEntity entity) {
         PersonSoapEntity personSoapEntity = new PersonSoapEntity();
         personSoapEntity.setId(entity.getId());
         personSoapEntity.setFirstName(entity.getFirstName());
@@ -99,7 +120,14 @@ public class PersonSoapServiceImpl implements PersonSoapService {
         return personSoapEntity;
     }
 
-    private List<PersonSoapEntity> createPersons(List<PersonEntity> entities){
+    private DeleteSoapPersonDto createDeleteSoapResponseDto(DeletePersonDto dto) {
+        DeleteSoapPersonDto deleteSoapPersonDto = new DeleteSoapPersonDto();
+        deleteSoapPersonDto.setCode(dto.getCode());
+        deleteSoapPersonDto.setText(dto.getText());
+        return deleteSoapPersonDto;
+    }
+
+    private List<PersonSoapEntity> createPersons(List<PersonEntity> entities) {
         List<PersonSoapEntity> persons = new ArrayList<>();
         for (PersonEntity entity : entities) {
             persons.add(createSoapEntity(entity));

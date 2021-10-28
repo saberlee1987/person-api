@@ -1,5 +1,6 @@
 package com.saber.person.soap.api.services;
 
+import com.saber.person.soap.api.dto.DeletePersonDto;
 import com.saber.person.soap.api.dto.PersonDto;
 import com.saber.person.soap.api.dto.PersonResponse;
 import com.saber.person.soap.api.dto.ResponseDto;
@@ -9,4 +10,6 @@ public interface PersonService {
     ResponseDto<PersonEntity> addPerson(PersonDto dto);
     ResponseDto<PersonResponse> findAll();
     ResponseDto<PersonEntity> findByNationalCode(String nationalCode);
+    ResponseDto<PersonEntity> updatePersonByNationalCode(String nationalCode,PersonDto dto);
+    ResponseDto<DeletePersonDto> deletePersonByNationalCode(String nationalCode);
 }

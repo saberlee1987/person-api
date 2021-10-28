@@ -1,16 +1,21 @@
 package com.saber.person.soap.api.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.saber.person.soap.api.dto.DeletePersonDto;
 import com.saber.person.soap.api.dto.PersonDto;
 import com.saber.person.soap.api.dto.PersonResponse;
 import com.saber.person.soap.api.dto.ResponseDto;
 import com.saber.person.soap.api.entity.PersonEntity;
 import com.saber.person.soap.api.services.PersonService;
-import io.swagger.annotations.*;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -20,6 +25,7 @@ import javax.validation.constraints.Size;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 @RequestMapping(value = "/services/person", produces = MediaType.APPLICATION_JSON_VALUE)
 @ApiOperation(value = "PersonController", nickname = "PersonController", produces = "application/json")
 public class PersonController {
@@ -93,6 +99,65 @@ public class PersonController {
         } catch (Exception ex) {
             log.info("Response for findAllPerson  ====> {}", response);
         }
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping(value = "/updateByNationalCode/{nationalCode}")
+    @ApiOperation(value = "updateByNationalCode", nickname = "updateByNationalCode", produces = "application/json", httpMethod = "PUT")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(code = 200, message = "Success", response = ResponseDto.class),
+                    @ApiResponse(code = 400, message = "BAD_REQUEST", response = ResponseDto.class),
+                    @ApiResponse(code = 406, message = "NOT_ACCEPTABLE", response = ResponseDto.class)
+            }
+    )
+    public ResponseEntity<ResponseDto<PersonEntity>> updatePersonByNationalCode(@PathVariable(name = "nationalCode")
+                                                                                @NotBlank(message = "nationalCode is Required")
+                                                                                @Size(min = 10, max = 10, message = "nationalCode must be 10 digit")
+                                                                                @Pattern(regexp = "\\d+", message = "Please Enter correct nationalCode")
+                                                                                @Valid
+                                                                                @ApiParam(name = "nationalCode", value = "nationalCode", example = "0079028748", required = true) String nationalCode,
+                                                                                @RequestBody @Valid
+                                                                                        PersonDto dto) {
+        try {
+            log.info("Request for updatePersonByNationalCode by  nationalCode {} ====> {}", nationalCode, mapper.writeValueAsString(dto));
+        } catch (Exception ex) {
+            log.info("Request for updatePersonByNationalCode by  nationalCode {} ====> {}", nationalCode, dto);
+        }
+        ResponseDto<PersonEntity> response = this.personService.updatePersonByNationalCode(nationalCode, dto);
+        try {
+            log.info("Response for updatePersonByNationalCode by nationalCode {}  ====> {}", nationalCode, mapper.writeValueAsString(response));
+        } catch (Exception ex) {
+            log.info("Response for updatePersonByNationalCode by  nationalCode {} ====> {}", nationalCode, response);
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping(value = "/deleteByNationalCode/{nationalCode}")
+    @ApiOperation(value = "deleteByNationalCode", nickname = "deleteByNationalCode", produces = "application/json", httpMethod = "DELETE")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(code = 200, message = "Success", response = ResponseDto.class),
+                    @ApiResponse(code = 400, message = "BAD_REQUEST", response = ResponseDto.class),
+                    @ApiResponse(code = 406, message = "NOT_ACCEPTABLE", response = ResponseDto.class)
+            }
+    )
+    public ResponseEntity<ResponseDto<DeletePersonDto>> deletePersonByNationalCode(@PathVariable(name = "nationalCode")
+                                                                                @NotBlank(message = "nationalCode is Required")
+                                                                                @Size(min = 10, max = 10, message = "nationalCode must be 10 digit")
+                                                                                @Pattern(regexp = "\\d+", message = "Please Enter correct nationalCode")
+                                                                                @Valid
+                                                                                @ApiParam(name = "nationalCode", value = "nationalCode", example = "0079028748", required = true) String nationalCode) {
+        log.info("Request for deletePersonByNationalCode by  nationalCode {} ", nationalCode);
+
+        ResponseDto<DeletePersonDto> response = this.personService.deletePersonByNationalCode(nationalCode);
+        try {
+            log.info("Response for deletePersonByNationalCode by nationalCode {}  ====> {}", nationalCode, mapper.writeValueAsString(response));
+        } catch (Exception ex) {
+            log.info("Response for deletePersonByNationalCode by  nationalCode {} ====> {}", nationalCode, response);
+        }
+
         return ResponseEntity.ok(response);
     }
 }

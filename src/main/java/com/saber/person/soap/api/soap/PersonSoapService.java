@@ -1,8 +1,7 @@
 package com.saber.person.soap.api.soap;
 
-import com.saber.person.soap.api.soap.dto.PersonAllResponseDto;
-import com.saber.person.soap.api.soap.dto.PersonSoapDto;
-import com.saber.person.soap.api.soap.dto.PersonSoapResponseDto;
+import com.saber.person.soap.api.soap.dto.*;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -16,15 +15,22 @@ public interface PersonSoapService {
 
     @WebMethod(operationName = "AddPerson",action = "AddPerson")
     @WebResult(name = "PersonSoapResponseDto")
-    PersonSoapResponseDto addPerson(@WebParam(name = "personDto") @XmlElement(required = true) PersonSoapDto dto);
+    PersonSoapResponse addPerson(@WebParam(name = "personDto") @XmlElement(required = true) PersonSoapDto dto);
 
     @WebMethod(operationName = "FindByNationalCode",action = "FindByNationalCode")
     @WebResult(name = "PersonSoapResponseDto")
-    PersonSoapResponseDto findByNationalCode(@WebParam(name = "nationalCode") @XmlElement(required = true,defaultValue = "") String nationalCode);
+    PersonSoapResponse findByNationalCode(@WebParam(name = "nationalCode") @XmlElement(required = true,defaultValue = "") String nationalCode);
 
 
     @WebMethod(operationName = "FindAll",action = "FindAll")
     @WebResult(name = "PersonAllResponseDto")
-    PersonAllResponseDto findAll();
+    PersonSoapResponse findAll();
 
+    @WebMethod(operationName = "UpdatePersonByNationalCode",action = "UpdatePersonByNationalCode")
+    @WebResult(name = "PersonSoapResponseDto")
+    PersonSoapResponse updatePersonByNationalCode(@WebParam(name = "nationalCode") @XmlElement(required = true,defaultValue = "")String nationalCode,@WebParam(name = "personDto") @XmlElement(required = true) PersonSoapDto dto);
+
+    @WebMethod(operationName = "DeletePersonByNationalCode",action = "DeletePersonByNationalCode")
+    @WebResult(name = "DeletePersonSoapResponseDto")
+    PersonSoapResponse deletePersonByNationalCode(@WebParam(name = "nationalCode") @XmlElement(required = true,defaultValue = "")String nationalCode);
 }

@@ -14,6 +14,8 @@ server:
     max-connections: 10000
     max-http-form-post-size: 20
 
+  max-http-header-size: 64000
+
 
 springfox:
   documentation:
@@ -52,6 +54,23 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+
+camel:
+  springboot:
+    route-controller-thread-pool-size: 6000
+    jmx-management-statistics-level: extended
+    consumer-template-cache-size: 6000
+    producer-template-cache-size: 6000
+    backlog-tracing: true
+  dataformat:
+    json-jackson:
+      pretty-print: true
+      auto-discover-object-mapper: true
+
+
+
+
+
 
 hawtio:
   authenticationEnabled: false
