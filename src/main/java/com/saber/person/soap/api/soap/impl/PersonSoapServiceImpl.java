@@ -1,6 +1,5 @@
 package com.saber.person.soap.api.soap.impl;
 
-import com.saber.person.soap.api.dto.ResponseDto;
 import com.saber.person.soap.api.entity.PersonEntity;
 import com.saber.person.soap.api.repositories.PersonRepository;
 import com.saber.person.soap.api.soap.PersonSoapService;
@@ -41,7 +40,7 @@ public class PersonSoapServiceImpl implements PersonSoapService {
 
     @Override
     public PersonSoapResponse findByNationalCode(String nationalCode) {
-        ResponseDto<PersonSoapEntity> responseDto = new ResponseDto<>();
+
         if (nationalCode == null || nationalCode.trim().length() < 10 || !nationalCode.trim().matches("\\d+")) {
             return new PersonSoapResponse(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString()
                    ,null , getValidation("nationalCode", "nationalCode invalid")));
