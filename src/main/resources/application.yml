@@ -12,9 +12,9 @@ server:
     connection-timeout: 60000
     max-keep-alive-requests: 300
     max-connections: 10000
-    max-http-form-post-size: 20
+    max-http-form-post-size: 10
 
-  max-http-header-size: 64000
+  max-http-header-size: 128000
 
 
 springfox:
