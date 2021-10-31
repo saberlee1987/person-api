@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:cxfbus="http://cxf.apache.org/core"
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean class="com.saber.person.soap.api.config.CustomUsernameTokenValidator"
+          id="customUsernameToken"/>
+
+    <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor" id="serverWss4jInInterceptor">
+        <constructor-arg>
+            <map>
+                <entry key="action" value="UsernameToken"/>
+                <entry key="passwordType" value="PasswordText"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <cxfbus:bus name="securing-webservice" id="securing-webservice">
+
+        <cxfbus:properties>
+            <entry key="ws-security.ut.validator" value-ref="customUsernameToken"/>
+        </cxfbus:properties>
+
+        <cxfbus:inInterceptors>
+            <ref bean="serverWss4jInInterceptor"/>
+        </cxfbus:inInterceptors>
+    </cxfbus:bus>
+</beans>
