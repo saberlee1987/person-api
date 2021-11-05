@@ -1,7 +1,6 @@
 package com.saber.person.soap.api.soap;
 
 import com.saber.person.soap.api.soap.dto.*;
-
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;

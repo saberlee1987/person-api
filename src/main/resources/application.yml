@@ -16,6 +16,13 @@ server:
 
   max-http-header-size: 128000
 
+  ssl:
+    key-store-type: PKCS12
+    key-store: classpath:keystore/saber66.p12
+    key-store-password: saber@123
+    key-alias: saber66
+    enabled: true
+
 
 springfox:
   documentation:
