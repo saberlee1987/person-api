@@ -46,6 +46,9 @@ public class PersonServiceImpl implements PersonService {
     @Override
     @Transactional(readOnly = true)
     public ResponseDto<PersonEntity> findByNationalCode(String nationalCode) {
+        if (nationalCode!=null)
+            nationalCode = nationalCode.replaceAll("\\s+","");
+
         Optional<PersonEntity> optionalPersonEntity = this.personRepository.findByNationalCode(nationalCode);
         if (optionalPersonEntity.isEmpty()) {
             throw new ResourceNotFoundException(String.format("Person with nationalCode %s does not exist"
@@ -56,6 +59,9 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public ResponseDto<PersonEntity> updatePersonByNationalCode(String nationalCode, PersonDto dto) {
+        if (nationalCode!=null)
+            nationalCode = nationalCode.replaceAll("\\s+","");
+
         Optional<PersonEntity> optionalPersonEntity = this.personRepository.findByNationalCode(nationalCode);
         if (optionalPersonEntity.isEmpty()) {
             throw new ResourceNotFoundException(String.format("Person with nationalCode %s does not exist"
@@ -72,6 +78,9 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public ResponseDto<DeletePersonDto> deletePersonByNationalCode(String nationalCode) {
+        if (nationalCode!=null)
+            nationalCode = nationalCode.replaceAll("\\s+","");
+
         Optional<PersonEntity> optionalPersonEntity = this.personRepository.findByNationalCode(nationalCode);
         if (optionalPersonEntity.isEmpty()) {
             throw new ResourceNotFoundException(String.format("Person with nationalCode %s does not exist"
@@ -87,7 +96,7 @@ public class PersonServiceImpl implements PersonService {
         entity.setFirstName(dto.getFirstName());
         entity.setLastName(dto.getLastName());
         entity.setEmail(dto.getEmail());
-        entity.setNationalCode(dto.getNationalCode());
+        entity.setNationalCode(dto.getNationalCode().replaceAll("\\s+",""));
         entity.setAge(dto.getAge());
         return entity;
     }

@@ -5,6 +5,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import org.apache.camel.CamelContext;
+import org.apache.camel.component.metrics.routepolicy.MetricsRoutePolicyFactory;
+import org.apache.camel.component.micrometer.messagehistory.MicrometerMessageHistoryFactory;
+import org.apache.camel.component.micrometer.routepolicy.MicrometerRoutePolicyFactory;
+import org.apache.camel.spring.boot.CamelContextConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +22,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
 import java.beans.PropertyVetoException;
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +38,7 @@ public class AppConfig {
     @Bean(value = "personDataSource")
     @Primary
     public ComboPooledDataSource dataSource() throws PropertyVetoException {
-        ComboPooledDataSource dataSource =new ComboPooledDataSource();
+        ComboPooledDataSource dataSource = new ComboPooledDataSource();
         dataSource.setDriverClass(comboConfig.getDriverClassName());
         dataSource.setJdbcUrl(comboConfig.getUrl());
         dataSource.setUser(comboConfig.getUsername());
@@ -54,6 +60,7 @@ public class AppConfig {
         dataSource.setNumHelperThreads(comboConfig.getNumHelperThreads());
         return dataSource;
     }
+
     @Bean
     public ObjectMapper mapper() {
         ObjectMapper mapper = new ObjectMapper();
@@ -69,6 +76,22 @@ public class AppConfig {
         return mapper;
     }
 
+    @Bean
+    public CamelContextConfiguration camelContextConfiguration() {
+        return new CamelContextConfiguration() {
+            @Override
+            public void beforeApplicationStart(CamelContext camelContext) {
+                camelContext.addRoutePolicyFactory(new MicrometerRoutePolicyFactory());
+                camelContext.addRoutePolicyFactory(new MetricsRoutePolicyFactory());
+                camelContext.setMessageHistoryFactory(new MicrometerMessageHistoryFactory());
+            }
+
+            @Override
+            public void afterApplicationStart(CamelContext camelContext) {
+
+            }
+        };
+    }
 
     @Bean
     public Docket docket() {
@@ -83,20 +106,20 @@ public class AppConfig {
     }
 
     private List<SecurityScheme> securitySchemeList() {
-     SecurityScheme securityScheme = new ApiKey(AUTHORIZATION, AUTHORIZATION, AUTHORIZATION_HEADER);
+        SecurityScheme securityScheme = new ApiKey(AUTHORIZATION, AUTHORIZATION, AUTHORIZATION_HEADER);
         return Collections.singletonList(securityScheme);
     }
 
 
     private List<SecurityContext> securityContext() {
-       	return Collections.singletonList(SecurityContext.builder().securityReferences(defaultAuth()).forPaths(PathSelectors.any()).build());
+        return Collections.singletonList(SecurityContext.builder().securityReferences(defaultAuth()).forPaths(PathSelectors.any()).build());
     }
 
     private List<SecurityReference> defaultAuth() {
         AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
-       	return Collections.singletonList(new SecurityReference(AUTHORIZATION, authorizationScopes));
+        return Collections.singletonList(new SecurityReference(AUTHORIZATION, authorizationScopes));
     }
 
     private ApiInfo apiInfo() {

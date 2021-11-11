@@ -40,6 +40,8 @@ public class PersonSoapServiceImpl implements PersonSoapService {
 
     @Override
     public PersonSoapResponse findByNationalCode(String nationalCode) {
+            if (nationalCode!=null)
+                  nationalCode = nationalCode.replaceAll("\\s+","");
 
         if (nationalCode == null || nationalCode.trim().length() < 10 || !nationalCode.trim().matches("\\d+")) {
             return new PersonSoapResponse(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString()
@@ -60,6 +62,10 @@ public class PersonSoapServiceImpl implements PersonSoapService {
 
     @Override
     public PersonSoapResponse updatePersonByNationalCode(String nationalCode, PersonSoapDto dto) {
+
+        if (nationalCode!=null)
+            nationalCode = nationalCode.replaceAll("\\s+","");
+
         Set<ConstraintViolation<PersonSoapDto>> errorValidation = validatorAdapter.validate(dto);
         if (errorValidation.size() > 0) {
             return new PersonSoapResponse(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString(),
@@ -76,6 +82,10 @@ public class PersonSoapServiceImpl implements PersonSoapService {
 
     @Override
     public DeletePersonResponse deletePersonByNationalCode(String nationalCode) {
+
+        if (nationalCode!=null)
+            nationalCode = nationalCode.replaceAll("\\s+","");
+
         if (nationalCode == null || nationalCode.trim().length() < 10 || !nationalCode.trim().matches("\\d+")) {
             return new DeletePersonResponse(getErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString()
                    ,null , getValidation("nationalCode", "nationalCode invalid")));
@@ -126,7 +136,7 @@ public class PersonSoapServiceImpl implements PersonSoapService {
         PersonEntity entity = new PersonEntity();
         entity.setFirstName(personSoapDto.getFirstName());
         entity.setLastName(personSoapDto.getLastName());
-        entity.setNationalCode(personSoapDto.getNationalCode());
+        entity.setNationalCode(personSoapDto.getNationalCode().replaceAll("\\s+",""));
         entity.setEmail(personSoapDto.getEmail());
         entity.setAge(personSoapDto.getAge());
         return entity;
@@ -137,7 +147,7 @@ public class PersonSoapServiceImpl implements PersonSoapService {
         personSoapEntity.setId(entity.getId());
         personSoapEntity.setFirstName(entity.getFirstName());
         personSoapEntity.setLastName(entity.getLastName());
-        personSoapEntity.setNationalCode(entity.getNationalCode());
+        personSoapEntity.setNationalCode(entity.getNationalCode().replaceAll("\\s+",""));
         personSoapEntity.setEmail(entity.getEmail());
         personSoapEntity.setAge(entity.getAge());
         return personSoapEntity;
