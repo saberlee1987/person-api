@@ -1,8 +1,8 @@
 # Getting Started
 
 
-### http://localhost:8001/soapServices/personSoap?wsdl soap address
-### http://localhost:8001/swagger-ui.html swagger ui
+### https://localhost:8001/soapServices/personSoap?wsdl soap address
+### https://localhost:8001/swagger-ui.html swagger ui
 ### Reference Documentation
 
 For further reference, please consider the following sections:
