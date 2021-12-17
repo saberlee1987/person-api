@@ -7,3 +7,5 @@ keytool -genkeypair -alias saber66 -keyalg RSA -keysize 2048 -storetype PKCS12 -
 keytool -genkeypair -alias saber66 -keyalg RSA -keysize 2048 -keystore saber66.jks -validity 3650
 
 keytool -importkeystore -srckeystore saber66.jks -destkeystore saber66_2.p12 -deststoretype pkcs12
+
+https://stackoverflow.com/questions/50928061/certificate-for-localhost-doesnt-match-any-of-the-subject-alternative-names
