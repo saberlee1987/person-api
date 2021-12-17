@@ -14,14 +14,15 @@ server:
     max-connections: 10000
     max-http-form-post-size: 10
 
-  max-http-header-size: 128000
+  max-http-header-size: 512000
 
   ssl:
-    key-store-type: PKCS12
-    key-store: classpath:keystore/saber66.p12
+    key-store-type: JKS
+    key-store: classpath:keystore/person_api.jks
     key-store-password: saber@123
     key-alias: saber66
     enabled: true
+    protocol: SSL
 
 
 springfox:
@@ -86,7 +87,7 @@ spring:
 
 camel:
   springboot:
-    route-controller-thread-pool-size: 6000
+    route-controller-thread-pool-size: 20000
     jmx-management-statistics-level: extended
     consumer-template-cache-size: 6000
     producer-template-cache-size: 6000
@@ -95,10 +96,6 @@ camel:
     json-jackson:
       pretty-print: true
       auto-discover-object-mapper: true
-
-
-
-
 
 
 hawtio:

@@ -2,7 +2,6 @@ package com.saber.person.soap.api.adviser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saber.person.soap.api.dto.ErrorResponse;
-import com.saber.person.soap.api.dto.ResponseDto;
 import com.saber.person.soap.api.dto.ValidationDto;
 import com.saber.person.soap.api.exceptions.ResourceDuplicationException;
 import com.saber.person.soap.api.exceptions.ResourceNotFoundException;
@@ -36,44 +35,39 @@ public class PersonControllerAdviser extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = ResourceDuplicationException.class)
     public ResponseEntity<?> resourceDuplicationException(ResourceDuplicationException exception) {
         log.error("ResourceDuplicationException error ====> {}", exception.getMessage());
-        ResponseDto<?> responseDto = new ResponseDto<>();
-        ErrorResponse errorResponse = new ErrorResponse();
+         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setCode(HttpStatus.BAD_REQUEST.value());
         errorResponse.setMessage(HttpStatus.BAD_REQUEST.toString());
         errorResponse.setOriginalMessage(String.format("{\"code\":%d,\"message\":\"%s\"}",
                 HttpStatus.BAD_REQUEST.value(), exception.getMessage()));
-        responseDto.setError(errorResponse);
         try {
-            log.error("ResourceDuplicationException error ====> {}", mapper.writeValueAsString(responseDto));
+            log.error("ResourceDuplicationException error ====> {}", mapper.writeValueAsString(errorResponse));
         } catch (Exception ex) {
-            log.error("ResourceDuplicationException error ====> {}", responseDto);
+            log.error("ResourceDuplicationException error ====> {}", errorResponse);
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDto);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(value = ResourceNotFoundException.class)
     public ResponseEntity<?> resourceNotFoundException(ResourceNotFoundException exception) {
         log.error("ResourceNotFoundException error ====> {}", exception.getMessage());
-        ResponseDto<?> responseDto = new ResponseDto<>();
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setCode(HttpStatus.NOT_ACCEPTABLE.value());
         errorResponse.setMessage(HttpStatus.NOT_ACCEPTABLE.toString());
         errorResponse.setOriginalMessage(String.format("{\"code\":%d,\"message\":\"%s\"}",
                 HttpStatus.NOT_ACCEPTABLE.value(), exception.getMessage()));
-        responseDto.setError(errorResponse);
         try {
-            log.error("ResourceNotFoundException error ====> {}", mapper.writeValueAsString(responseDto));
+            log.error("ResourceNotFoundException error ====> {}", mapper.writeValueAsString(errorResponse));
         } catch (Exception ex) {
-            log.error("ResourceNotFoundException error ====> {}", responseDto);
+            log.error("ResourceNotFoundException error ====> {}", errorResponse);
         }
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(responseDto);
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(errorResponse);
     }
 
     @Override
     protected ResponseEntity<Object> handleMissingPathVariable(MissingPathVariableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
         log.error("handleMissingPathVariable error ====> {}", ex.getMessage());
-        ResponseDto<?> responseDto = new ResponseDto<>();
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setCode(HttpStatus.BAD_REQUEST.value());
         errorResponse.setMessage(HttpStatus.BAD_REQUEST.toString());
@@ -85,19 +79,18 @@ public class PersonControllerAdviser extends ResponseEntityExceptionHandler {
         validationDtoList.add(validationDto);
 
         errorResponse.setValidations(validationDtoList);
-        responseDto.setError(errorResponse);
         try {
-            log.error("handleMissingPathVariable error ====> {}", mapper.writeValueAsString(responseDto));
+            log.error("handleMissingPathVariable error ====> {}", mapper.writeValueAsString(errorResponse));
         } catch (Exception e) {
-            log.error("handleMissingPathVariable error ====> {}", responseDto);
+            log.error("handleMissingPathVariable error ====> {}", errorResponse);
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDto);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @Override
     protected ResponseEntity<Object> handleBindException(BindException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         log.error("handleBindException error ====> {}", ex.getMessage());
-        ResponseDto<?> responseDto = new ResponseDto<>();
+
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setCode(HttpStatus.BAD_REQUEST.value());
         errorResponse.setMessage(HttpStatus.BAD_REQUEST.toString());
@@ -111,37 +104,33 @@ public class PersonControllerAdviser extends ResponseEntityExceptionHandler {
             validationDtoList.add(validationDto);
         }
         errorResponse.setValidations(validationDtoList);
-        responseDto.setError(errorResponse);
         try {
-            log.error("handleBindException error ====> {}", mapper.writeValueAsString(responseDto));
+            log.error("handleBindException error ====> {}", mapper.writeValueAsString(errorResponse));
         } catch (Exception e) {
-            log.error("handleBindException error ====> {}", responseDto);
+            log.error("handleBindException error ====> {}", errorResponse);
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDto);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         log.error("handleMissingServletRequestParameter error ====> {}", ex.getMessage());
-        ResponseDto<?> responseDto = new ResponseDto<>();
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setCode(HttpStatus.BAD_REQUEST.value());
         errorResponse.setMessage(HttpStatus.BAD_REQUEST.toString());
         errorResponse.setOriginalMessage(String.format("{\"code\":%d,\"message\":\"%s\"}",
                 HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
-        responseDto.setError(errorResponse);
         try {
-            log.error("handleMissingServletRequestParameter error ====> {}", mapper.writeValueAsString(responseDto));
+            log.error("handleMissingServletRequestParameter error ====> {}", mapper.writeValueAsString(errorResponse));
         } catch (Exception e) {
-            log.error("handleMissingServletRequestParameter error ====> {}", responseDto);
+            log.error("handleMissingServletRequestParameter error ====> {}", errorResponse);
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDto);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         log.error("handleMethodArgumentNotValid error ====> {}", ex.getMessage());
-        ResponseDto<?> responseDto = new ResponseDto<>();
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setCode(HttpStatus.BAD_REQUEST.value());
         errorResponse.setMessage(HttpStatus.BAD_REQUEST.toString());
@@ -155,20 +144,18 @@ public class PersonControllerAdviser extends ResponseEntityExceptionHandler {
             validationDtoList.add(validationDto);
         }
         errorResponse.setValidations(validationDtoList);
-        responseDto.setError(errorResponse);
         try {
-            log.error("handleMethodArgumentNotValid error ====> {}", mapper.writeValueAsString(responseDto));
+            log.error("handleMethodArgumentNotValid error ====> {}", mapper.writeValueAsString(errorResponse));
         } catch (Exception e) {
-            log.error("handleMethodArgumentNotValid error ====> {}", responseDto);
+            log.error("handleMethodArgumentNotValid error ====> {}", errorResponse);
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDto);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(value = ConstraintViolationException.class)
     public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
 
         log.error("handleConstraintViolationException error ====> {}", ex.getMessage());
-        ResponseDto<?> responseDto = new ResponseDto<>();
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setCode(HttpStatus.BAD_REQUEST.value());
         errorResponse.setMessage(HttpStatus.BAD_REQUEST.toString());
@@ -184,12 +171,11 @@ public class PersonControllerAdviser extends ResponseEntityExceptionHandler {
         }
 
         errorResponse.setValidations(validationDtoList);
-        responseDto.setError(errorResponse);
         try {
-            log.error("handleMissingPathVariable error ====> {}", mapper.writeValueAsString(responseDto));
+            log.error("handleMissingPathVariable error ====> {}", mapper.writeValueAsString(errorResponse));
         } catch (Exception e) {
-            log.error("handleMissingPathVariable error ====> {}", responseDto);
+            log.error("handleMissingPathVariable error ====> {}", errorResponse);
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDto);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 }

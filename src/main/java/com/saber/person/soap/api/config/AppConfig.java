@@ -22,7 +22,6 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
 import java.beans.PropertyVetoException;
 import java.util.Collections;
 import java.util.List;
@@ -125,7 +124,7 @@ public class AppConfig {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("Person Service APi")
-                .version("version1.1 1400/08/05")
+                .version("version1.2 1400/09/26")
                 .description("Person Service Api")
                 .build();
     }

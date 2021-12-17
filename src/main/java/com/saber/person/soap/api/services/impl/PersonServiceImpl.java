@@ -3,7 +3,6 @@ package com.saber.person.soap.api.services.impl;
 import com.saber.person.soap.api.dto.DeletePersonDto;
 import com.saber.person.soap.api.dto.PersonDto;
 import com.saber.person.soap.api.dto.PersonResponse;
-import com.saber.person.soap.api.dto.ResponseDto;
 import com.saber.person.soap.api.entity.PersonEntity;
 import com.saber.person.soap.api.exceptions.ResourceDuplicationException;
 import com.saber.person.soap.api.exceptions.ResourceNotFoundException;
@@ -13,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -24,28 +22,28 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     @Transactional
-    public ResponseDto<PersonEntity> addPerson(PersonDto dto) {
+    public PersonEntity addPerson(PersonDto dto) {
         if (this.personRepository.findByNationalCode(dto.getNationalCode()).isPresent()) {
             throw new ResourceDuplicationException(String.format("Person with nationalCode %s exist"
                     , dto.getNationalCode()));
         }
         removeWhiteSpace(dto);
         PersonEntity entity = creatEntity(dto);
-        return new ResponseDto<>(this.personRepository.save(entity));
+        return this.personRepository.save(entity);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public ResponseDto<PersonResponse> findAll() {
+    public PersonResponse findAll() {
         List<PersonEntity> persons = this.personRepository.findAll();
         PersonResponse personResponse = new PersonResponse();
         personResponse.setPersons(persons);
-        return new ResponseDto<>(personResponse);
+        return personResponse;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public ResponseDto<PersonEntity> findByNationalCode(String nationalCode) {
+    public PersonEntity findByNationalCode(String nationalCode) {
         if (nationalCode!=null)
             nationalCode = nationalCode.replaceAll("\\s+","");
 
@@ -54,11 +52,11 @@ public class PersonServiceImpl implements PersonService {
             throw new ResourceNotFoundException(String.format("Person with nationalCode %s does not exist"
                     , nationalCode));
         }
-        return new ResponseDto<>(optionalPersonEntity.get());
+        return optionalPersonEntity.get();
     }
 
     @Override
-    public ResponseDto<PersonEntity> updatePersonByNationalCode(String nationalCode, PersonDto dto) {
+    public PersonEntity updatePersonByNationalCode(String nationalCode, PersonDto dto) {
         if (nationalCode!=null)
             nationalCode = nationalCode.replaceAll("\\s+","");
 
@@ -73,11 +71,11 @@ public class PersonServiceImpl implements PersonService {
         personEntity.setLastName(dto.getLastName());
         personEntity.setAge(dto.getAge());
         personEntity.setEmail(dto.getEmail());
-        return new ResponseDto<>(this.personRepository.save(personEntity));
+        return this.personRepository.save(personEntity);
     }
 
     @Override
-    public ResponseDto<DeletePersonDto> deletePersonByNationalCode(String nationalCode) {
+    public DeletePersonDto deletePersonByNationalCode(String nationalCode) {
         if (nationalCode!=null)
             nationalCode = nationalCode.replaceAll("\\s+","");
 
@@ -88,7 +86,7 @@ public class PersonServiceImpl implements PersonService {
         }
         PersonEntity personEntity = optionalPersonEntity.get();
         this.personRepository.delete(personEntity);
-       return new ResponseDto<>(new DeletePersonDto(0,"successfully"));
+       return new DeletePersonDto(0,"successfully");
     }
 
     private PersonEntity creatEntity(PersonDto dto) {
