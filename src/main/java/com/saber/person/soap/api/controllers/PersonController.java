@@ -23,7 +23,7 @@ import javax.validation.constraints.Size;
 @RequiredArgsConstructor
 @Slf4j
 @Validated
-@RequestMapping(value = "/services/person", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "${service.api.path}", produces = MediaType.APPLICATION_JSON_VALUE)
 @ApiOperation(value = "PersonController", nickname = "PersonController", produces = "application/json")
 public class PersonController {
     private final PersonService personService;

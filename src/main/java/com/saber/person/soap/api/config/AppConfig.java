@@ -10,7 +10,7 @@ import org.apache.camel.component.metrics.routepolicy.MetricsRoutePolicyFactory;
 import org.apache.camel.component.micrometer.messagehistory.MicrometerMessageHistoryFactory;
 import org.apache.camel.component.micrometer.routepolicy.MicrometerRoutePolicyFactory;
 import org.apache.camel.spring.boot.CamelContextConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -22,6 +22,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
 import java.beans.PropertyVetoException;
 import java.util.Collections;
 import java.util.List;
@@ -31,8 +32,20 @@ import java.util.List;
 public class AppConfig {
     private static final String AUTHORIZATION = "Authorization";
     private static final String AUTHORIZATION_HEADER = "header";
-    @Autowired
-    private ComboPoolDataSourceConfig comboConfig;
+    private final ComboPoolDataSourceConfig comboConfig;
+
+    @Value(value = "${service.swagger.title}")
+    private String swaggerTitle;
+    @Value(value = "${service.swagger.version}")
+    private String swaggerVersion;
+    @Value(value = "${service.swagger.description}")
+    private String swaggerDescription;
+    @Value(value = "${service.swagger.packageController}")
+    private String packageController;
+
+    public AppConfig(ComboPoolDataSourceConfig comboConfig) {
+        this.comboConfig = comboConfig;
+    }
 
     @Bean(value = "personDataSource")
     @Primary
@@ -64,7 +77,6 @@ public class AppConfig {
     public ObjectMapper mapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        mapper.configure(SerializationFeature.FAIL_ON_SELF_REFERENCES, false);
         mapper.configure(SerializationFeature.FAIL_ON_SELF_REFERENCES, false);
         mapper.configure(SerializationFeature.FAIL_ON_UNWRAPPED_TYPE_IDENTIFIERS, false);
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
@@ -98,7 +110,7 @@ public class AppConfig {
                 .securitySchemes(securitySchemeList())
                 .securityContexts(securityContext())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.saber.person.soap.api.controllers"))
+                .apis(RequestHandlerSelectors.basePackage(packageController))
                 .paths(PathSelectors.any())
                 .build()
                 .apiInfo(apiInfo());
@@ -123,9 +135,9 @@ public class AppConfig {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("Person Service APi")
-                .version("version1.2 1400/09/26")
-                .description("Person Service Api")
+                .title(this.swaggerTitle)
+                .version(swaggerVersion)
+                .description(swaggerDescription)
                 .build();
     }
 }

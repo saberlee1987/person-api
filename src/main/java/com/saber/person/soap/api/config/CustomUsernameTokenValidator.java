@@ -5,10 +5,9 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.UsernameTokenValidator;
-import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
+//@Component
 public class CustomUsernameTokenValidator extends UsernameTokenValidator {
     @Override
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {

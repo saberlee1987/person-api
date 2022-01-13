@@ -11,7 +11,6 @@ import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,18 +18,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SoapConfig {
 
-//    @Value(value = "${cxf.path}")
-//    private String cxfPath;
     @Value(value = "${cxf.endpoint}")
     private String endpoint;
-//    @Value(value = "${cxf.host}")
-//    private String host;
-//    @Value(value = "${cxf.soapGatewayPort}")
-//    private int soapGatewayPort;
-
     private final PersonSoapService personSoapService;
     private final ObjectMapper mapper;
-    private final CustomUsernameTokenValidator customUsernameTokenValidator;
+   // private final CustomUsernameTokenValidator customUsernameTokenValidator;
 
     @Bean
     public PersonSoapRoute personSoapRoute(){
@@ -40,7 +32,7 @@ public class SoapConfig {
         return soapRoute;
     }
 
-    @Bean
+   // @Bean
     public WSS4JInInterceptor wss4JInInterceptor(){
         WSS4JInInterceptor wss4JInInterceptor = new WSS4JInInterceptor();
         Map<String,Object> config = new HashMap<>();
@@ -50,13 +42,13 @@ public class SoapConfig {
         return wss4JInInterceptor;
     }
 
-    @Bean(value = "securing-webservice")
+   // @Bean(value = "securing-webservice")
     public Bus cxfBus(){
 
         BusFactory busFactory = CXFBusFactory.newInstance();
         Bus bus = busFactory.createBus();
         Map<String,Object> config = new HashMap<>();
-        config.put("ws-security.ut.validator",customUsernameTokenValidator);
+       // config.put("ws-security.ut.validator",customUsernameTokenValidator);
         bus.setProperties(config);
         bus.getInInterceptors().add(wss4JInInterceptor());
         return bus;

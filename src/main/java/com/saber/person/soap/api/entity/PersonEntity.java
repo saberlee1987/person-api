@@ -15,9 +15,9 @@ public class PersonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "firstName",length = 70)
+    @Column(name = "firstname",length = 70)
     private String firstName;
-    @Column(name = "lastName",length = 90)
+    @Column(name = "lastname",length = 90)
     private String lastName;
     @Column(name = "nationalCode",length = 10,unique = true)
     private String nationalCode;
